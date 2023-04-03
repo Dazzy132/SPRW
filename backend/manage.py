@@ -2,20 +2,10 @@
 import os
 import sys
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 def main():
-    if os.getenv('DEBUG') == 'True':
-        os.environ.setdefault(
-            'DJANGO_SETTINGS_MODULE', 'core.settings.development'
-        )
-    else:
-        os.environ.setdefault(
-            'DJANGO_SETTINGS_MODULE', 'core.settings.production'
-        )
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

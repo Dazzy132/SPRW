@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 
 
-class UsersConfig(AppConfig):
+class A12NConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'api.users'
-    label = 'api_users'
+    name = 'a12n'

@@ -1,7 +1,9 @@
 from allauth.account.adapter import DefaultAccountAdapter
 
-AFTER_LOGIN_URL = '/api/users/'
-LOGIN_URL = "/api/auth/login/"
+CURRENT_VERSION = "v1"
+
+AFTER_LOGIN_URL = f'/api/{CURRENT_VERSION}/users/'
+LOGIN_URL = f"/api/{CURRENT_VERSION}/auth/login/"
 
 
 class MyAccountAdapter(DefaultAccountAdapter):
