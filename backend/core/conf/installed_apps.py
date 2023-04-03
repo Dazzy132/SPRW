@@ -23,4 +23,5 @@ INSTALLED_APPS = [
     # Приложения Django
     'a12n.apps.A12NConfig',
     'users.apps.UsersConfig',
+    'posts.apps.PostsConfig',
 ]
