@@ -1,4 +1,6 @@
+import uuid
 from django.db import models
+from dataclasses import dataclass
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator, RegexValidator
@@ -7,11 +9,51 @@ from .validators import validate_username
 
 
 class User(AbstractUser):
+
+    @dataclass
+    class GENDERS:
+        MALE = 'male'
+        FEMALE = 'female'
+
+    GENDER_CHOICES = (
+        (GENDERS.MALE, 'Мужчина'),
+        (GENDERS.FEMALE, 'Женщина'),
+    )
+
+    @dataclass
+    class UserGroup:
+        USER = 'user'
+        MODERATOR = 'moderator'
+        ADMIN = 'admin'
+
+    USER_GROUPS = (
+        (UserGroup.USER, 'Аутентифицированный пользователь'),
+        (UserGroup.MODERATOR, 'Модератор'),
+        (UserGroup.ADMIN, 'Администратор'),
+    )
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [
         'email', 'first_name', 'last_name'
     ]
 
+    uuid = models.UUIDField(
+        db_index=True,
+        unique=True,
+        default=uuid.uuid4
+    )
+    gender = models.CharField(
+        'Гендер',
+        choices=GENDER_CHOICES,
+        max_length=20,
+        blank=True
+    )
+    group = models.CharField(
+        'Группа',
+        choices=USER_GROUPS,
+        max_length=30,
+        default='user'
+    )
     username = models.CharField(
         _("username"),
         db_index=True,
