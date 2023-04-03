@@ -3,7 +3,7 @@ from split_settings.tools import include
 from core.conf.envrion import env
 
 SECRET_KEY = env("SECRET_KEY", cast=str, default="s3cr3t")
-DEBUG = env("DEBUG", cast=bool, default=False)
+DEBUG = env("DEBUG")
 
 include(
     "conf/base.py",
@@ -18,7 +18,6 @@ include(
     "conf/timezone.py",
     "conf/email.py",
     "conf/api.py",
-
     "conf/auth.py",
     "conf/debug_toolbar.py",
 )
