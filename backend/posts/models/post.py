@@ -1,4 +1,5 @@
 from behaviors.behaviors import Timestamped, Authored
+from posts.models.fields import LikesRelated, ViewsRelated
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import QuerySet
@@ -18,7 +19,7 @@ class PostQuerySet(QuerySet):
         return self.order_by("-likes")
 
 
-class Post(Authored, Timestamped):
+class Post(Authored, Timestamped, LikesRelated, ViewsRelated):
     objects = PostQuerySet.as_manager()
 
     text = models.TextField(
@@ -32,14 +33,6 @@ class Post(Authored, Timestamped):
         help_text="Загрузить изображение к посту",
         blank=True,
         null=True,
-    )
-    likes = models.PositiveIntegerField(
-        "Количество лайков",
-        default=0
-    )
-    views = models.PositiveIntegerField(
-        "Количество просмотров",
-        default=0
     )
     uuid = models.CharField(
         "Идентификатор",
