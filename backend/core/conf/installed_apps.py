@@ -9,6 +9,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     # Улучшенная версия shell
     'django_extensions',
+    'smart_selects',
 
     # Установленные пакеты
     'rest_framework',

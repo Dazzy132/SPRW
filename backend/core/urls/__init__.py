@@ -10,6 +10,7 @@ api = [
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include(api)),
+    path('chaining/', include('smart_selects.urls')),
 ]
 
 if settings.DEBUG:

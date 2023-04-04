@@ -2,13 +2,14 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from behaviors.behaviors import Authored, Timestamped
 from posts.models.fields import LikesRelated
+from smart_selects.db_fields import ChainedForeignKey
 
 
 class Comment(Authored, Timestamped, LikesRelated):
     post = models.ForeignKey(
         'posts.post',
         on_delete=models.CASCADE,
-        verbose_name='Пост'
+        verbose_name='Пост',
     )
     text = models.TextField(
         "Текст",
@@ -21,16 +22,18 @@ class Comment(Authored, Timestamped, LikesRelated):
         null=True,
         blank=True,
     )
-    parent = models.ForeignKey(
+    parent = ChainedForeignKey(
         'self',
         verbose_name='Родитель',
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        chained_field="post",
+        chained_model_field="post",
     )
 
     def __str__(self):
-        return f"{self.author.username} - {self.pk}"
+        return f"{self.author.username} - {self.pk} - {self.text}"
 
     def clean(self):
         """Проверка на уровне валидации"""
