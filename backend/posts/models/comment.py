@@ -1,8 +1,9 @@
+from behaviors.behaviors import Authored, Timestamped
 from django.core.exceptions import ValidationError
 from django.db import models
-from behaviors.behaviors import Authored, Timestamped
-from posts.models.fields import LikesRelated
 from smart_selects.db_fields import ChainedForeignKey
+
+from posts.models.fields import LikesRelated
 
 
 class Comment(Authored, Timestamped, LikesRelated):

@@ -1,10 +1,11 @@
-from behaviors.behaviors import Timestamped, Authored
-from posts.models.fields import LikesRelated, ViewsRelated
+from behaviors.behaviors import Authored, Timestamped
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from posts.models.fields import LikesRelated, ViewsRelated
 
 
 class PostQuerySet(QuerySet):

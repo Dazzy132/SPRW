@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.db.models import Q
-from posts.models import Post, Tag, Comment
+
+from posts.models import Comment, Post, Tag
 
 
 class PostCommentsInline(admin.TabularInline):

@@ -1,11 +1,15 @@
+from django.core.cache import cache
 from django.db.models import F
 from django.shortcuts import get_object_or_404
-from django.core.cache import cache
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from .serializers import PostGETSerializer, PostCreateSerializer, CommentGETSerializer, CommentCreateSerializer, TagSerializer
-from posts.models import Post, Comment, Tag
+
+from posts.models import Comment, Post, Tag
+
+from .serializers import (CommentCreateSerializer, CommentGETSerializer,
+                          PostCreateSerializer, PostGETSerializer,
+                          TagSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -28,7 +32,7 @@ class PostViewSet(ModelViewSet):
             instance.views = F('views') + 1
             instance.save()
             instance.refresh_from_db()
-            cache.set(f"{user_key}_{post_key}", True, timeout=20)
+            cache.set(f"{user_key}_{post_key}", True, timeout=60)
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)

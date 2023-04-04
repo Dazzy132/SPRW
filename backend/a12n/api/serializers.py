@@ -1,6 +1,6 @@
-from rest_framework import serializers
-from django.db import transaction
 from dj_rest_auth.registration.serializers import RegisterSerializer
+from django.db import transaction
+from rest_framework import serializers
 
 
 class CustomRegisterSerializer(RegisterSerializer):

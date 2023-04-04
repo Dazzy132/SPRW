@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path, include
 from django.contrib import admin
+from django.urls import include, path
 
 api = [
     path("v1/", include("core.urls.v1"))

@@ -1,5 +1,5 @@
-from django.db import models
 from behaviors.behaviors import Slugged
+from django.db import models
 
 
 class Tag(Slugged):

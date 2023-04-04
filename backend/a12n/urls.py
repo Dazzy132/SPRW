@@ -1,6 +1,6 @@
-from django.urls import path, include
 from allauth.account.views import ConfirmEmailView
 from dj_rest_auth.registration.views import VerifyEmailView
+from django.urls import include, path
 
 urlpatterns = [
     path('account-confirm-email/', VerifyEmailView.as_view()),
