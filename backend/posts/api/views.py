@@ -85,3 +85,17 @@ class CommentViewSet(ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return CommentGETSerializer
         return CommentCreateSerializer
+
+    @action(
+        detail=True,
+        permission_classes=[IsAuthenticated],
+        methods=["POST", "DELETE"])
+    def add_like(self, request, post_id, pk):
+        comment = self.get_object()
+        increment = 1 if self.request.method == "POST" else -1
+        comment.likes = F('likes') + increment
+        comment.save()
+        comment.refresh_from_db()
+
+        serializer = CommentGETSerializer(comment)
+        return Response(serializer.data, status=200)
