@@ -1,7 +1,8 @@
 from django.core.cache import cache
 from django.db.models import F
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.decorators import action
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
@@ -48,6 +49,20 @@ class PostViewSet(ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return PostGETSerializer
         return PostCreateSerializer
+
+    @action(
+        detail=True,
+        permission_classes=[IsAuthenticated],
+        methods=["POST", "DELETE"])
+    def add_like(self, request, pk):
+        post = self.get_object()
+        increment = 1 if self.request.method == "POST" else -1
+        post.likes = F('likes') + increment
+        post.save()
+        post.refresh_from_db()
+
+        serializer = PostGETSerializer(post)
+        return Response(serializer.data, status=200)
 
 
 class CommentViewSet(ModelViewSet):
