@@ -1,9 +1,22 @@
 from django.contrib import admin
-from django.utils.html import format_html
+from django.db.models import Q
+from posts.models import Post, Tag, Comment
 
-from posts.models.post import Post
-from posts.models.tag import Tag
-from posts.models.comment import Comment
+
+class PostCommentsInline(admin.TabularInline):
+    model = Comment
+    extra = 1
+    fields = [
+        "author",
+        "text",
+        "image"
+    ]
+
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    # exclude = ['comments']
+    inlines = [PostCommentsInline]
 
 
 @admin.register(Comment)
@@ -19,5 +32,4 @@ class CommentAdmin(admin.ModelAdmin):
         js = ('script.js',)
 
 
-admin.site.register(Post)
 admin.site.register(Tag)

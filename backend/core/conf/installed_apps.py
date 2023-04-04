@@ -7,8 +7,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django.contrib.sites',
-    # Улучшенная версия shell
-    'django_extensions',
+    'django_extensions',  # Улучшенная версия shell
     'smart_selects',
 
     # Установленные пакеты
