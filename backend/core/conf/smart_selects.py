@@ -1,0 +1,1 @@
+USE_DJANGO_JQUERY = True

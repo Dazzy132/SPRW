@@ -20,4 +20,5 @@ include(
     "conf/api.py",
     "conf/auth.py",
     "conf/debug_toolbar.py",
+    "conf/smart_selects.py",
 )
