@@ -1,5 +1,6 @@
+from django.db.models import F
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import action
+from django.core.cache import cache
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -16,6 +17,21 @@ class PostViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Кеширование для предотвращения накрутки просмотров
+        user_key = f"user_{request.user.pk}"
+        post_key = f"post_{instance.pk}"
+        if cache.get(f"{user_key}_{post_key}") is None:
+            instance.views = F('views') + 1
+            instance.save()
+            instance.refresh_from_db()
+            cache.set(f"{user_key}_{post_key}", True, timeout=20)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def get_queryset(self):
         return (
