@@ -1,5 +1,9 @@
 from django.db import models
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 class LikesRelated(models.Model):
     likes = models.PositiveIntegerField(
@@ -20,3 +24,21 @@ class ViewsRelated(models.Model):
     class Meta:
         abstract = True
 
+
+class UserRelated(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="%(app_label)s_%(class)s_user"
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Created(models.Model):
+    created = models.DateTimeField(
+        "Дата",
+        auto_now_add=True
+    )

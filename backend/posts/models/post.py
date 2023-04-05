@@ -5,7 +5,7 @@ from django.db.models import QuerySet
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from posts.models.fields import LikesRelated, ViewsRelated
+from posts.models.fields import LikesRelated, ViewsRelated, UserRelated, Created
 
 
 class PostQuerySet(QuerySet):
@@ -18,6 +18,15 @@ class PostQuerySet(QuerySet):
     def most_likes(self) -> QuerySet["Post"]:
         """Сортировка постов по самым оцененным"""
         return self.order_by("-likes")
+
+    def add_user_annotations(self, user_id: int) -> QuerySet["Post"]:
+        return self.annotate(
+            is_liked=models.Exists(
+                PostLike.objects.filter(
+                    user_id=user_id, post_id=models.OuterRef('pk')
+                )
+            )
+        )
 
 
 class Post(Authored, Timestamped, LikesRelated, ViewsRelated):
@@ -79,3 +88,27 @@ def set_post_uuid(sender, instance, **kwargs):
     if not instance.uuid:
         instance.uuid = f"{instance.author.pk}_{(instance.author.pk << 32) + instance.pk}"
         instance.save()
+
+
+class PostLike(UserRelated, Created):
+    post = models.ForeignKey(
+        Post,
+        verbose_name="Пост",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f"{self.user.username} лайкнул пост {self.post.pk}"
+
+    class Meta:
+        verbose_name = "Лайк к посту"
+        verbose_name_plural = "Лайки к постам"
+        ordering = ["-created"]
+        db_table = "post_likes"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["post", "user"],
+                name="unique_post_user_likes",
+            )
+        ]
+

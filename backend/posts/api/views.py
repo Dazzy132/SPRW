@@ -6,11 +6,11 @@ from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from posts.models import Comment, Post, Tag
+from posts.models import Comment, Post, Tag, PostLike
 
 from .serializers import (CommentCreateSerializer, CommentGETSerializer,
                           PostCreateSerializer, PostGETSerializer,
-                          TagSerializer)
+                          TagSerializer, UserLikesGetSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -39,11 +39,14 @@ class PostViewSet(ModelViewSet):
         return Response(serializer.data)
 
     def get_queryset(self):
-        return (
+        queryset = (
             Post.objects
             .select_related('author')
-            .prefetch_related("tags", "comments__author")
+            .prefetch_related("tags", "comments")
         )
+        if self.request.user.is_authenticated:
+            return queryset.add_user_annotations(user_id=self.request.user.pk)
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -99,3 +102,14 @@ class CommentViewSet(ModelViewSet):
 
         serializer = CommentGETSerializer(comment)
         return Response(serializer.data, status=200)
+
+
+class UserLikesViewSet(ModelViewSet):
+
+    def get_queryset(self):
+        return PostLike.objects.select_related("post", "user")
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return UserLikesGetSerializer
+        return UserLikesGetSerializer

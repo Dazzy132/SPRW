@@ -2,12 +2,13 @@ from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from posts.models import Comment, Post, Tag
+from posts.models import Comment, Post, Tag, PostLike
 
 User = get_user_model()
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор для представления Тегов"""
 
     class Meta:
         model = Tag
@@ -15,6 +16,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CommentGETSerializer(serializers.ModelSerializer):
+    """Данный сериализатор подходит только для HTTP GET запросов и не
+    поддерживает создание или обновление объектов Comment. """
+
     author = serializers.SlugRelatedField(
         slug_field="username",
         queryset=User.objects.all(),
@@ -24,7 +28,7 @@ class CommentGETSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = ('id', 'author', 'post', 'text', 'image', 'parent',)
 
 
 class CommentCreateSerializer(CommentGETSerializer):
@@ -61,12 +65,13 @@ class PostGETSerializer(serializers.ModelSerializer):
     tags = TagSerializer(
         many=True
     )
+    is_liked = serializers.BooleanField(default=False)
 
     class Meta:
         model = Post
         fields = [
-            "id", "uuid", "author", "text", "likes", "views", "comments",
-            "image", "tags", "created", "modified",
+            "id", "uuid", "author", "text", "likes", "is_liked", "views",
+            "comments", "image", "tags", "created", "modified",
         ]
 
 
@@ -88,3 +93,14 @@ class PostCreateSerializer(PostGETSerializer):
         read_only_fields = [
             "uuid", "likes", "views", "modified",
         ]
+
+
+class UserLikesGetSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        "username",
+        queryset=User.objects.all()
+    )
+
+    class Meta:
+        model = PostLike
+        fields = "__all__"

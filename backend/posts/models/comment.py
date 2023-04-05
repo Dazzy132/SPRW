@@ -32,6 +32,10 @@ class Comment(Authored, Timestamped, LikesRelated):
         chained_field="post",
         chained_model_field="post",
     )
+    likes = models.PositiveIntegerField(
+        default=0,
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.author.username} - {self.pk} - {self.text}"

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from posts.models import Comment, Post, Tag
+from posts.models import Comment, Post, Tag, PostLike
 
 
 class PostCommentsInline(admin.TabularInline):
@@ -15,7 +15,7 @@ class PostCommentsInline(admin.TabularInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    # exclude = ['comments']
+    exclude = ['comments']
     inlines = [PostCommentsInline]
 
 
@@ -33,3 +33,4 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Tag)
+admin.site.register(PostLike)
