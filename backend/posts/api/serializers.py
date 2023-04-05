@@ -83,6 +83,7 @@ class PostCreateSerializer(PostGETSerializer):
     )
     # Комментарии на момент создания поста не нужны
     comments = None
+    is_liked = None
 
     def to_representation(self, instance):
         return PostGETSerializer(instance).data
@@ -104,3 +105,29 @@ class UserLikesGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostLike
         fields = "__all__"
+
+
+class UserLikeCreateSerializer(serializers.ModelSerializer):
+
+    def validate(self, attrs):
+        is_liked = attrs["user"].posts_postlike_user.filter(
+            post=attrs["post"]
+        ).exists()
+
+        if self.context.get("request").method == "POST":
+            if is_liked:
+                raise serializers.ValidationError("Вы уже поставили лайк")
+
+        if self.context.get("request").method == "DELETE":
+            if not is_liked:
+                raise serializers.ValidationError(
+                    "Вы не можете убрать лайк которого нет"
+                )
+
+        return attrs
+
+    class Meta:
+        model = PostLike
+        fields = [
+            "user", "post", "created"
+        ]

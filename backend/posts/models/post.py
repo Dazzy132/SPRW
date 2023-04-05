@@ -94,7 +94,7 @@ class PostLike(UserRelated, Created):
     post = models.ForeignKey(
         Post,
         verbose_name="Пост",
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     def __str__(self):

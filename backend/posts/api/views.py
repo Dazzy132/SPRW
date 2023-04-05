@@ -10,7 +10,9 @@ from posts.models import Comment, Post, Tag, PostLike
 
 from .serializers import (CommentCreateSerializer, CommentGETSerializer,
                           PostCreateSerializer, PostGETSerializer,
-                          TagSerializer, UserLikesGetSerializer)
+                          TagSerializer, UserLikesGetSerializer,
+                          UserLikeCreateSerializer)
+from ..mixins import ListCreateDestroyView
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -53,19 +55,36 @@ class PostViewSet(ModelViewSet):
             return PostGETSerializer
         return PostCreateSerializer
 
-    @action(
-        detail=True,
-        permission_classes=[IsAuthenticated],
-        methods=["POST", "DELETE"])
-    def add_like(self, request, pk):
+    def likes_management(self):
         post = self.get_object()
+        serializer = UserLikeCreateSerializer(
+            data={"user": self.request.user.pk, "post": post.pk},
+            context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+
         increment = 1 if self.request.method == "POST" else -1
         post.likes = F('likes') + increment
         post.save()
         post.refresh_from_db()
 
-        serializer = PostGETSerializer(post)
-        return Response(serializer.data, status=200)
+        # TODO: Если передавать post через PostGETSerializer, то значение
+        #  is_liked будет False. Потому что QuerySet остался прежним и не
+        #  аннотирует его по новой.
+        #  Задача: Решить проблему, чтобы показывал
+        if self.request.method == "POST":
+            serializer.save()
+            return Response({"message": "Лайк поставлен"}, status=200)
+
+        post.postlike_set.filter(user=self.request.user).delete()
+        return Response({"message": "Лайк убран"}, status=200)
+
+    @action(
+        detail=True, permission_classes=[IsAuthenticated],
+        methods=["POST", "DELETE"]
+    )
+    def add_like(self, request, pk):
+        return self.likes_management()
 
 
 class CommentViewSet(ModelViewSet):
@@ -104,7 +123,7 @@ class CommentViewSet(ModelViewSet):
         return Response(serializer.data, status=200)
 
 
-class UserLikesViewSet(ModelViewSet):
+class UserLikesViewSet(ListCreateDestroyView):
 
     def get_queryset(self):
         return PostLike.objects.select_related("post", "user")
@@ -112,4 +131,4 @@ class UserLikesViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return UserLikesGetSerializer
-        return UserLikesGetSerializer
+        return UserLikeCreateSerializer

@@ -8,6 +8,7 @@ api = [
 ]
 
 urlpatterns = [
+    path('jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
     path("api/", include(api)),
     path('chaining/', include('smart_selects.urls')),
