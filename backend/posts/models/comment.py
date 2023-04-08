@@ -8,7 +8,7 @@ from posts.models.fields import LikesRelated
 
 class Comment(Authored, Timestamped, LikesRelated):
     post = models.ForeignKey(
-        'posts.post',
+        'posts.Post',
         on_delete=models.CASCADE,
         verbose_name='Пост',
     )

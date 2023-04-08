@@ -19,6 +19,7 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE': 'SPRW-AUTH',
     'USE_JWT': True,
     'REGISTER_SERIALIZER': 'a12n.api.serializers.CustomRegisterSerializer',
+    "OLD_PASSWORD_FIELD_ENABLED": True
 }
 
 # JWT_AUTH = {

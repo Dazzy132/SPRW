@@ -10,7 +10,6 @@ from .validators import validate_username
 
 
 class User(AbstractUser):
-
     @dataclass
     class GENDERS:
         MALE = 'male'
@@ -35,7 +34,7 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = [
-        'email', 'first_name', 'last_name'
+        'email', 'first_name', 'last_name', 'phone_number'
     ]
 
     uuid = models.UUIDField(
@@ -96,5 +95,15 @@ class User(AbstractUser):
         auto_now=True
     )
 
+    def _normalize_email(self, email):
+        return email.lower()
+
+    def save(self, *args, **kwargs):
+        self.email = self._normalize_email(self.email)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.email
+
+
+# https://pypi.org/project/django-phone-login/
