@@ -26,7 +26,7 @@ class Comment(Authored, Timestamped, LikesRelated):
     parent = ChainedForeignKey(
         'self',
         verbose_name='Родитель',
-        on_delete=models.SET_NULL,
+        on_delete=models.DO_NOTHING,
         blank=True,
         null=True,
         chained_field="post",
