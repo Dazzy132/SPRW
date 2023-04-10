@@ -1,10 +1,13 @@
+from behaviors.behaviors import Authored, Timestamped
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from smart_selects.db_fields import ChainedForeignKey
 
+from posts.models.fields import LikesRelated
 
-class Comment(models.Model):
+
+class Comment(Authored, Timestamped, LikesRelated):
     author = models.ForeignKey(get_user_model() ,on_delete=models.CASCADE)
     post = models.ForeignKey(
         'posts.Post',
@@ -12,7 +15,7 @@ class Comment(models.Model):
         verbose_name='Пост',
     )
     parent = ChainedForeignKey(
-        'self', on_delete=models.CASCADE, null=True,
+        'self', on_delete=models.DO_NOTHING, null=True,
         blank=True, related_name='replies',
         chained_field="post",
         chained_model_field="post",)
@@ -26,12 +29,6 @@ class Comment(models.Model):
         upload_to="comments/",
         null=True,
         blank=True,
-    )
-
-    likes = models.PositiveIntegerField(
-        'Лайки',
-        default=0,
-        blank=True
     )
 
     def __str__(self):
