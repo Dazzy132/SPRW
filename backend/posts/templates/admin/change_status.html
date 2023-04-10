@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+  <form method="post" action="{% url 'admin:change_status' %}" style="position: relative; top: 60%; left: 35%;">
+    {% csrf_token %}
+    <label for="id_status">Status:</label>
+    <select name="status" id="id_status">
+      <option value="">---------</option>
+      {% for choice in status_choices %}
+        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+      {% endfor %}
+    </select>
+    <input type="submit" name="apply" value="Apply">
+  </form>
+{% endblock %}
