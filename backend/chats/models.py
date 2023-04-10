@@ -1,6 +1,6 @@
+from behaviors.behaviors import Timestamped
 from django.contrib.auth import get_user_model
 from django.db import models
-from behaviors.behaviors import Timestamped
 from smart_selects.db_fields import ChainedForeignKey
 
 User = get_user_model()

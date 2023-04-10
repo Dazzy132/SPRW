@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.shortcuts import redirect, render
 from django.urls import path
 
-from posts.models import Comment, Post, Tag, PostLike, Complaints, \
-    CommentComplaint, PostComplaint
+from posts.models import (Comment, CommentComplaint, Complaints, Post,
+                          PostComplaint, PostLike, Tag)
 
 
 class PostCommentsInline(admin.TabularInline):

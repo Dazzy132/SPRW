@@ -1,6 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from chats.api.views import MessageViewSet, ChatViewSet
+
+from chats.api.views import ChatViewSet, MessageViewSet
 
 router = DefaultRouter()
 router.register(r"", ChatViewSet, basename="chats")

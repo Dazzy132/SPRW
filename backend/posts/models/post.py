@@ -5,7 +5,8 @@ from django.db.models import QuerySet
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from posts.models.fields import LikesRelated, ViewsRelated, UserRelated, Created
+from posts.models.fields import (Created, LikesRelated, UserRelated,
+                                 ViewsRelated)
 
 
 class PostQuerySet(QuerySet):

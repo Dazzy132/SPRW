@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
 
-
 User = get_user_model()
 
 

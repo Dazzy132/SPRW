@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from posts.models import Comment, Post, Tag, PostLike
+from posts.models import Comment, Post, PostLike, Tag
 
 User = get_user_model()
 

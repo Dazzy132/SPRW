@@ -6,13 +6,13 @@ from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from posts.models import Comment, Post, Tag, PostLike
+from posts.models import Comment, Post, PostLike, Tag
 
+from ..mixins import ListCreateDestroyView
 from .serializers import (CommentCreateSerializer, CommentGETSerializer,
                           PostCreateSerializer, PostGETSerializer,
-                          TagSerializer, UserLikesGetSerializer,
-                          UserLikeCreateSerializer)
-from ..mixins import ListCreateDestroyView
+                          TagSerializer, UserLikeCreateSerializer,
+                          UserLikesGetSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):

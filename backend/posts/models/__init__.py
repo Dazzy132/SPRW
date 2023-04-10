@@ -7,12 +7,10 @@
 """
 
 from posts.models.comment import Comment
-from posts.models.complaints import Complaints, CommentComplaint, PostComplaint
+from posts.models.complaints import CommentComplaint, Complaints, PostComplaint
 from posts.models.fields import LikesRelated, ViewsRelated
 from posts.models.post import Post, PostLike
 from posts.models.tag import Tag
-from posts.models.complaints import Complaints, CommentComplaint, PostComplaint
-
 
 __all__ = [
     "Post",
