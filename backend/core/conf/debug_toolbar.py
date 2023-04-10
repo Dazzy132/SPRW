@@ -1,8 +1,8 @@
 from core.conf.envrion import env
 
 if env('DEBUG'):
-    from core.conf.middleware import MIDDLEWARE
     from core.conf.installed_apps import INSTALLED_APPS
+    from core.conf.middleware import MIDDLEWARE
 
     MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
     INSTALLED_APPS += [

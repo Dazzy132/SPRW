@@ -1,7 +1,7 @@
 import os.path
 
-from core.conf.envrion import env
 from core.conf.base import BASE_DIR
+from core.conf.envrion import env
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

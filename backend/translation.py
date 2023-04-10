@@ -1,5 +1,5 @@
-from modeltranslation.translator import TranslationOptions, register
 from django.contrib.auth import get_user_model
+from modeltranslation.translator import TranslationOptions, register
 
 User = get_user_model()
 

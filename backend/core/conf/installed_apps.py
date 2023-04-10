@@ -1,4 +1,5 @@
 INSTALLED_APPS = [
+    # 'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -7,8 +8,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django.contrib.sites',
-    # Улучшенная версия shell
-    'django_extensions',
+    'django_extensions',  # Улучшенная версия shell
+    'smart_selects',
 
     # Установленные пакеты
     'rest_framework',
@@ -23,4 +24,6 @@ INSTALLED_APPS = [
     # Приложения Django
     'a12n.apps.A12NConfig',
     'users.apps.UsersConfig',
+    'posts.apps.PostsConfig',
+    "chats.apps.ChatsConfig",
 ]

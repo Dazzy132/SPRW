@@ -19,6 +19,7 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE': 'SPRW-AUTH',
     'USE_JWT': True,
     'REGISTER_SERIALIZER': 'a12n.api.serializers.CustomRegisterSerializer',
+    "OLD_PASSWORD_FIELD_ENABLED": True
 }
 
 # JWT_AUTH = {
@@ -35,4 +36,5 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'a12n.validators.NoSpacesPasswordValidator',},
 ]
