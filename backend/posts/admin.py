@@ -1,6 +1,9 @@
 from django.contrib import admin
-
-from posts.models import Comment, Post, Tag, PostLike
+from django.urls import path, reverse
+from django.shortcuts import render, redirect
+from dataclasses import dataclass
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from posts.models import Comment, Post, Tag, PostLike, CommentComplaint, PostComplaint, Complaints
 
 
 class PostCommentsInline(admin.TabularInline):
@@ -31,6 +34,40 @@ class CommentAdmin(admin.ModelAdmin):
     class Media:
         js = ('script.js',)
 
+
+class ComplainAdmin(admin.ModelAdmin):
+    list_display = ['id', 'complaint', 'complaint_status', 'user']
+    actions = ['change_status']
+    @admin.action(description='Изменить статус жалобы')
+    def change_status(self, request, *args, **kwargs):
+        queryset = self.get_queryset(request)
+        print(request)
+        if 'apply' in request.POST:
+            status = request.POST.get('status')
+            if status:
+                queryset.update(complaint_status=status)
+                return redirect(request.META.get('HTTP_REFERER'))
+
+        context = {
+            'queryset': queryset,
+            'status_choices': Complaints.COMPLAINT_STATUS_CHOISE,
+        }
+        return render(request, 'admin/change_status.html', context=context)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('change-status/', self.admin_site.admin_view(self.change_status), name='change_status'),
+        ]
+        return custom_urls + urls
+
+@admin.register(CommentComplaint)
+class CommentComplaintAdmin(ComplainAdmin):
+    list_display = ['comment'] + ComplainAdmin.list_display
+
+@admin.register(PostComplaint)
+class PostComplaintAdmin(ComplainAdmin):
+    list_display = ['post'] + ComplainAdmin.list_display 
 
 admin.site.register(Tag)
 admin.site.register(PostLike)
