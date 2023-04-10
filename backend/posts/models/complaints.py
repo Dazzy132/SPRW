@@ -2,7 +2,6 @@ from dataclasses import dataclass
 
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 
 
 class Complaints(models.Model):
@@ -24,8 +23,11 @@ class Complaints(models.Model):
     )
 
     CAUSE_OF_COMPLAINT_CHOISE = (
-        (CAUSE_OF_COMPLAINT.DRUGS, 'Публикация содержит пропоганду наркотиков'),
-        (CAUSE_OF_COMPLAINT.CHILD_PORNOGRAPHY, 'Публикация содержит детскую порнография'),
+        (
+            CAUSE_OF_COMPLAINT.DRUGS,
+            'Публикация содержит пропоганду наркотиков'),
+        (CAUSE_OF_COMPLAINT.CHILD_PORNOGRAPHY,
+         'Публикация содержит детскую порнография'),
     )
     complaint = models.CharField(
         'Жалоба',
@@ -39,12 +41,15 @@ class Complaints(models.Model):
     )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              verbose_name='пользователь оставивший жалобу')
+
     def get_fields(self, include_parents=False, include_hidden=False):
         pass
 
+
 class PostComplaint(Complaints):
     post = models.ForeignKey('posts.Post', on_delete=models.CASCADE,
-                                verbose_name='пост на который поступила жалоба')
+                             verbose_name='пост на который поступила жалоба')
+
     class Meta:
         verbose_name = 'Жалоба на пост'
         verbose_name_plural = 'Жалобы на пост'
@@ -52,20 +57,17 @@ class PostComplaint(Complaints):
     def __str__(self):
         return f"Жалоба на пост: {self.post}"
 
+
 class CommentComplaint(Complaints):
-    comment = models.ForeignKey('posts.Comment', on_delete=models.CASCADE,
-                            verbose_name='комментарий на который поступила жалоба')
+    comment = models.ForeignKey(
+        'posts.Comment',
+        on_delete=models.CASCADE,
+        verbose_name='комментарий на который поступила жалоба'
+    )
+
     class Meta:
         verbose_name = 'Жалоба на комментарий'
         verbose_name_plural = 'Жалобы на комментарии'
-    
+
     def __str__(self):
         return f"Жалоба на комментарий: {self.comment}"
-
-
-class CommentComplaint(Complaints):
-    comment = models.ForeignKey('posts.Comment', on_delete=models.CASCADE,
-                            verbose_name='комментарий на который поступила жалоба')
-    class Meta:
-        verbose_name = 'Жалоба на комментарий'
-        verbose_name_plural = 'Жалобы на комментарии'
