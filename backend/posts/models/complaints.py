@@ -5,6 +5,7 @@ from django.db import models
 
 
 class Complaints(models.Model):
+
     @dataclass
     class CAUSE_OF_COMPLAINT:
         DRUGS = 'drugs'
@@ -23,9 +24,8 @@ class Complaints(models.Model):
     )
 
     CAUSE_OF_COMPLAINT_CHOISE = (
-        (
-            CAUSE_OF_COMPLAINT.DRUGS,
-            'Публикация содержит пропоганду наркотиков'),
+        (CAUSE_OF_COMPLAINT.DRUGS,
+         'Публикация содержит пропоганду наркотиков'),
         (CAUSE_OF_COMPLAINT.CHILD_PORNOGRAPHY,
          'Публикация содержит детскую порнография'),
     )
@@ -39,16 +39,19 @@ class Complaints(models.Model):
         choices=COMPLAINT_STATUS_CHOISE,
         max_length=200, default='Жалоба на рассмотрении'
     )
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             verbose_name='пользователь оставивший жалобу')
-
-    def get_fields(self, include_parents=False, include_hidden=False):
-        pass
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        verbose_name='пользователь оставивший жалобу'
+    )
 
 
 class PostComplaint(Complaints):
-    post = models.ForeignKey('posts.Post', on_delete=models.CASCADE,
-                             verbose_name='пост на который поступила жалоба')
+    post = models.ForeignKey(
+        'posts.Post',
+        on_delete=models.CASCADE,
+        verbose_name='пост на который поступила жалоба'
+    )
 
     class Meta:
         verbose_name = 'Жалоба на пост'
