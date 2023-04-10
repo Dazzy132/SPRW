@@ -36,8 +36,11 @@ class MessageSerializer(serializers.ModelSerializer):
         slug_field="username", default=serializers.CurrentUserDefault(),
         read_only=True
     )
+    # replied = serializers.StringRelatedField()
 
     class Meta:
         model = Message
         fields = "__all__"
         read_only_fields = ["modified", "read", "chat"]
+
+

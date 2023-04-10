@@ -20,6 +20,13 @@ class ChatViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         try:
             user = get_object_or_404(User, id=kwargs.get('pk'))
+
+            if self.request.user == user:
+                return Response(
+                    {'error': 'Чат с собой запрещен'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
             chat = get_object_or_404(
                 Chat,
                 Q(owner=self.request.user, opponent=user) |

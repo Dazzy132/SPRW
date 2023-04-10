@@ -3,5 +3,3 @@ from chats.models import Message, Chat
 
 admin.site.register(Chat)
 admin.site.register(Message)
-
-# Register your models here.
