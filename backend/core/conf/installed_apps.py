@@ -25,4 +25,5 @@ INSTALLED_APPS = [
     'a12n.apps.A12NConfig',
     'users.apps.UsersConfig',
     'posts.apps.PostsConfig',
+    "chats.apps.ChatsConfig",
 ]
