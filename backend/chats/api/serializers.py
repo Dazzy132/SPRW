@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework import serializers
 
 from chats.models import Chat, Message
@@ -18,10 +19,10 @@ class ChatSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, attrs):
-        if self.context.get('request').user == attrs.get("opponent"):
-            raise serializers.ValidationError(
-                "Вы не можете начать чат с самим собой"
-            )
+        self.Meta.model.validate_chat_exists(
+            owner=self.context.get("request").user,
+            opponent=attrs.get("opponent")
+        )
 
         return attrs
 

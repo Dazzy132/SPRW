@@ -1,6 +1,8 @@
 from behaviors.behaviors import Timestamped
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 from smart_selects.db_fields import ChainedForeignKey
 
 User = get_user_model()
@@ -21,6 +23,34 @@ class Chat(Timestamped):
 
     def __str__(self):
         return f"Диалог {self.owner} и {self.opponent}"
+
+    @staticmethod
+    def validate_chat_exists(owner, opponent):
+        if owner == opponent:
+            raise ValidationError("Чат с самим с собой запрещен")
+        if Chat.objects.filter(
+                models.Q(owner=owner, opponent=opponent) |
+                models.Q(owner=opponent, opponent=owner)
+        ).exists():
+            raise ValidationError(
+                f"Чат с участниками {owner} и {opponent} уже существует"
+            )
+
+    @staticmethod
+    def find_chat(user1, user2):
+        return get_object_or_404(
+            Chat,
+            models.Q(owner=user1, opponent=user2) |
+            models.Q(owner=user2, opponent=user1)
+        )
+
+    def clean(self):
+        self.validate_chat_exists(self.owner, self.opponent)
+
+    # TODO: Для ограничения в shell
+    # def save(self, *args, **kwargs):
+    #     self.full_clean()
+    #     super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Чат'

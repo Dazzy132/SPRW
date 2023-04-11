@@ -2,5 +2,10 @@ from django.contrib import admin
 
 from chats.models import Chat, Message
 
-admin.site.register(Chat)
+
+@admin.register(Chat)
+class ChatAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(Message)
