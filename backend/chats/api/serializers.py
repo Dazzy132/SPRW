@@ -17,10 +17,11 @@ class ChatSerializer(serializers.ModelSerializer):
         slug_field="username",
         queryset=User.objects.all(),
     )
+    new_messages = serializers.IntegerField(read_only=True)
 
     def validate(self, attrs):
         self.Meta.model.validate_chat_exists(
-            owner=self.context.get("request").user,
+            owner=self.context.get("user"),
             opponent=attrs.get("opponent")
         )
 

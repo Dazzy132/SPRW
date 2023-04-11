@@ -2,13 +2,27 @@ from behaviors.behaviors import Timestamped
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import OuterRef, Q, Subquery, Exists, Count
 from django.shortcuts import get_object_or_404
 from smart_selects.db_fields import ChainedForeignKey
 
 User = get_user_model()
 
 
+class ChatQuerySet(models.QuerySet):
+
+    def get_count_new_messages(self, user_id: int):
+        return self.annotate(
+            new_messages=Count(
+                'messages',
+                filter=~Q(messages__sender_id=user_id) & Q(messages__read=False)
+            )
+        )
+
+
 class Chat(Timestamped):
+    objects = ChatQuerySet.as_manager()
+
     owner = models.ForeignKey(
         User,
         verbose_name="Создатель чата",
@@ -28,6 +42,7 @@ class Chat(Timestamped):
     def validate_chat_exists(owner, opponent):
         if owner == opponent:
             raise ValidationError("Чат с самим с собой запрещен")
+
         if Chat.objects.filter(
                 models.Q(owner=owner, opponent=opponent) |
                 models.Q(owner=opponent, opponent=owner)
@@ -47,7 +62,7 @@ class Chat(Timestamped):
     def clean(self):
         self.validate_chat_exists(self.owner, self.opponent)
 
-    # TODO: Для ограничения в shell
+    # TODO: Для ограничения в shell (но возможно будет вызываться 2 clean)
     # def save(self, *args, **kwargs):
     #     self.full_clean()
     #     super().save(*args, **kwargs)
