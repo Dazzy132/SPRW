@@ -22,4 +22,5 @@ include(
     "conf/debug_toolbar.py",
     "conf/smart_selects.py",
     "conf/jet-admin.py",
+    "conf/cors.py",
 )

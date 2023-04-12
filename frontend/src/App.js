@@ -1,9 +1,15 @@
+import './styles/main.css'
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import AppRouter from "./components/AppRouter";
+
 function App() {
+
   return (
-   <div>
-     React Работает!
-   </div>
+    <BrowserRouter>
+     <AppRouter />
+    </BrowserRouter>
   );
+
 }
 
 export default App;

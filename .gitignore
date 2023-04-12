@@ -154,3 +154,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /frontend/node_modules/
+/frontend/help.md
