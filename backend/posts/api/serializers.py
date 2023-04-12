@@ -36,12 +36,6 @@ class CommentCreateSerializer(CommentGETSerializer):
         queryset=Post.objects.all()
     )
 
-    # def create(self, validated_data):
-    #     post = validated_data.pop('post')
-    #     comment = Comment.objects.create(**validated_data)
-    #     post.comments.add(comment)
-    #     return comment
-
     class Meta:
         model = Comment
         fields = [
@@ -60,7 +54,7 @@ class PostGETSerializer(serializers.ModelSerializer):
         required=False
     )
     comments = CommentGETSerializer(
-        many=True, read_only=True, source="comment_set"
+        many=True, read_only=True, source="comments"
     )
     tags = TagSerializer(
         many=True

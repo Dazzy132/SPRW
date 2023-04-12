@@ -44,7 +44,7 @@ class PostViewSet(ModelViewSet):
         queryset = (
             Post.objects
             .select_related('author')
-            .prefetch_related("tags", "comment_set")
+            .prefetch_related("tags", "comments")
         )
         if self.request.user.is_authenticated:
             return queryset.add_user_annotations(user_id=self.request.user.pk)

@@ -12,6 +12,7 @@ class Comment(Authored, Timestamped, LikesRelated):
         'posts.Post',
         on_delete=models.CASCADE,
         verbose_name='Пост',
+        related_name='comments',
     )
     parent = ChainedForeignKey(
         'self',
