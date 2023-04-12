@@ -54,7 +54,7 @@ class PostGETSerializer(serializers.ModelSerializer):
         required=False
     )
     comments = CommentGETSerializer(
-        many=True, read_only=True, source="comments"
+        many=True, read_only=True
     )
     tags = TagSerializer(
         many=True
