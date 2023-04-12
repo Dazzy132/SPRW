@@ -36,11 +36,11 @@ class CommentCreateSerializer(CommentGETSerializer):
         queryset=Post.objects.all()
     )
 
-    def create(self, validated_data):
-        post = validated_data.pop('post')
-        comment = Comment.objects.create(**validated_data)
-        post.comments.add(comment)
-        return comment
+    # def create(self, validated_data):
+    #     post = validated_data.pop('post')
+    #     comment = Comment.objects.create(**validated_data)
+    #     post.comments.add(comment)
+    #     return comment
 
     class Meta:
         model = Comment
@@ -60,7 +60,7 @@ class PostGETSerializer(serializers.ModelSerializer):
         required=False
     )
     comments = CommentGETSerializer(
-        many=True
+        many=True, read_only=True, source="comment_set"
     )
     tags = TagSerializer(
         many=True
@@ -81,8 +81,6 @@ class PostCreateSerializer(PostGETSerializer):
         required=False,
         queryset=Tag.objects.all(),
     )
-    # Комментарии на момент создания поста не нужны
-    comments = None
     is_liked = None
 
     def to_representation(self, instance):
@@ -90,7 +88,7 @@ class PostCreateSerializer(PostGETSerializer):
 
     class Meta:
         model = Post
-        exclude = ["comments"]
+        fields = "__all__"
         read_only_fields = [
             "uuid", "likes", "views", "modified",
         ]

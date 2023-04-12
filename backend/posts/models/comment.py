@@ -8,17 +8,20 @@ from posts.models.fields import LikesRelated
 
 
 class Comment(Authored, Timestamped, LikesRelated):
-    author = models.ForeignKey(get_user_model() ,on_delete=models.CASCADE)
     post = models.ForeignKey(
         'posts.Post',
         on_delete=models.CASCADE,
         verbose_name='Пост',
     )
     parent = ChainedForeignKey(
-        'self', on_delete=models.DO_NOTHING, null=True,
-        blank=True, related_name='replies',
+        'self',
+        on_delete=models.DO_NOTHING,
+        related_name='replies',
+        null=True,
+        blank=True,
         chained_field="post",
-        chained_model_field="post",)
+        chained_model_field="post",
+    )
     text = models.TextField(
         "Текст",
         null=True,

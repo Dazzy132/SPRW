@@ -18,7 +18,6 @@ class PostCommentsInline(admin.TabularInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    exclude = ['comments']
     inlines = [PostCommentsInline]
 
 
@@ -77,3 +76,4 @@ class PostComplaintAdmin(ComplainAdmin):
 
 admin.site.register(Tag)
 admin.site.register(PostLike)
+admin.site.register(Comment)
