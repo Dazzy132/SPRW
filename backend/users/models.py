@@ -6,7 +6,7 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .validators import validate_username
+from users.validators import validate_username
 
 
 class User(AbstractUser):
@@ -90,6 +90,17 @@ class User(AbstractUser):
             )
         ],
     )
+    phone_number = models.CharField(
+        max_length=13,
+        verbose_name=_('Phone number'),
+        unique=True,
+        validators=[
+            RegexValidator(
+                r'^\+?\d{11}$',
+                message="Номер телефона должен содержать ровно 11 цифр."
+            )
+        ],
+    )
     updated_at = models.DateTimeField(
         _("Обновлён"),
         auto_now=True
@@ -100,6 +111,9 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         self.email = self._normalize_email(self.email)
+        if (not self.phone_number.startswith('+')
+                and len(self.phone_number) == 11):
+            self.phone_number = '+' + self.phone_number
         super().save(*args, **kwargs)
 
     def __str__(self):

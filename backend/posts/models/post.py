@@ -59,12 +59,6 @@ class Post(Authored, Timestamped, LikesRelated, ViewsRelated):
         related_name="posts",
         blank=True,
     )
-    comments = models.ManyToManyField(
-        "posts.Comment",
-        verbose_name="Комментарии",
-        blank=True,
-        related_name='posts'
-    )
 
     def __str__(self):
         return f"{self.author.username} - {self.uuid} - {self.id} {self.text}"

@@ -36,9 +36,10 @@ class PostViewSet(ModelViewSet):
             instance.save()
             instance.refresh_from_db()
             cache.set(f"{user_key}_{post_key}", True, timeout=60)
-
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        serialized_data = serializer.data
+
+        return Response(serialized_data)
 
     def get_queryset(self):
         queryset = (

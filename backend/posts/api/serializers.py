@@ -16,9 +16,6 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CommentGETSerializer(serializers.ModelSerializer):
-    """Данный сериализатор подходит только для HTTP GET запросов и не
-    поддерживает создание или обновление объектов Comment. """
-
     author = serializers.SlugRelatedField(
         slug_field="username",
         queryset=User.objects.all(),
@@ -60,7 +57,7 @@ class PostGETSerializer(serializers.ModelSerializer):
         required=False
     )
     comments = CommentGETSerializer(
-        many=True
+        many=True,
     )
     tags = TagSerializer(
         many=True
@@ -89,8 +86,8 @@ class PostCreateSerializer(PostGETSerializer):
         return PostGETSerializer(instance).data
 
     class Meta:
+        fields = "__all__"
         model = Post
-        exclude = ["comments"]
         read_only_fields = [
             "uuid", "likes", "views", "modified",
         ]
