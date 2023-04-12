@@ -49,14 +49,21 @@ class ChatViewSet(ModelViewSet):
             user = get_object_or_404(User, id=kwargs.get('pk'))
             self.check_forbidden_chat(current_user, user)
 
-            chat = Chat.find_chat(user1=current_user, user2=user)
-            serializer = self.get_serializer(chat)
+            chat = Chat.objects.filter(
+                Q(owner=current_user, opponent=user) |
+                Q(owner=user, opponent=current_user)
+            ).get_count_new_messages(current_user)
+
+            chat[0].messages.filter(sender=user).update(read=True)
+
+            serializer = self.get_serializer(chat[0])
             return Response(serializer.data)
 
-        except Http404:
+        except (Http404, IndexError):
             return Response(
                 {'error': 'Вы еще не начали диалог с этим пользователем'},
-                status=status.HTTP_404_NOT_FOUND)
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class MessageViewSet(ModelViewSet):

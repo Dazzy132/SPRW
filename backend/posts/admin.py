@@ -76,4 +76,3 @@ class PostComplaintAdmin(ComplainAdmin):
 
 admin.site.register(Tag)
 admin.site.register(PostLike)
-admin.site.register(Comment)
