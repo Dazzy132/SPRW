@@ -22,17 +22,17 @@ class PostAdmin(admin.ModelAdmin):
     inlines = [PostCommentsInline]
 
 
-# @admin.register(Comment)
-# class CommentAdmin(admin.ModelAdmin):
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('post', 'author', 'text', 'image', 'id')
+    # def get_form(self, request, obj=None, **kwargs):
+    #     form = super().get_form(request, obj, **kwargs)
+    #     if obj:
+    #         form.base_fields['post'].disabled = True
+    #     return form
 
-#     def get_form(self, request, obj=None, **kwargs):
-#         form = super().get_form(request, obj, **kwargs)
-#         if obj:
-#             form.base_fields['post'].disabled = True
-#         return form
-
-#     class Media:
-#         js = ('script.js',)
+    # class Media:
+    #     js = ('script.js',)
 
 
 class ComplainAdmin(admin.ModelAdmin):
@@ -74,6 +74,6 @@ class CommentComplaintAdmin(ComplainAdmin):
 class PostComplaintAdmin(ComplainAdmin):
     list_display = ['post'] + ComplainAdmin.list_display
 
-admin.site.register(Comment)
+
 admin.site.register(Tag)
 admin.site.register(PostLike)

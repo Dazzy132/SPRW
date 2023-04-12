@@ -25,7 +25,7 @@ class CommentGETSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'post', 'text', 'image', 'parent',)
+        fields = ('id', 'author', 'post', 'text', 'image', 'parent')
 
 
 class CommentCreateSerializer(CommentGETSerializer):
@@ -41,9 +41,7 @@ class CommentCreateSerializer(CommentGETSerializer):
 
     class Meta:
         model = Comment
-        fields = [
-            "post", "text", "image", "parent"
-        ]
+        fields = ("post", "text", "image", "parent")
 
 
 class PostGETSerializer(serializers.ModelSerializer):
@@ -57,7 +55,7 @@ class PostGETSerializer(serializers.ModelSerializer):
         required=False
     )
     comments = CommentGETSerializer(
-        many=True,
+        many=True
     )
     tags = TagSerializer(
         many=True

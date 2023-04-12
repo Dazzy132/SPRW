@@ -61,7 +61,7 @@ class Post(Authored, Timestamped, LikesRelated, ViewsRelated):
     )
 
     def __str__(self):
-        return f"{self.author.username} - {self.uuid} - {self.id} {self.text}"
+        return f"{self.uuid}"
 
     def clean(self):
         """Проверка на уровне валидации"""

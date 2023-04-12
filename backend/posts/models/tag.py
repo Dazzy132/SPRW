@@ -17,4 +17,3 @@ class Tag(Slugged):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
-
