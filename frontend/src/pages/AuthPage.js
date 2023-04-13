@@ -13,9 +13,7 @@ const AuthPage = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
-
   const dispatch = useDispatch()
-  const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -24,6 +22,8 @@ const AuthPage = () => {
     }
   }, [dispatch]);
 
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
+
   function loginButton(e) {
     e.preventDefault()
     dispatch(loginRequest())
@@ -31,34 +31,34 @@ const AuthPage = () => {
       .then(response => {
         dispatch(loginSuccess(response.data["access_token"]))
         localStorage.setItem("token", response.data["access_token"])
+        console.log(response)
       })
       .catch(e => {
         dispatch(loginFailure(e.message))
-        setError(e.message)
+        setError(e.response.data.non_field_errors)
       })
   }
 
   function logoutButton(e) {
     e.preventDefault()
     const token = localStorage.getItem('token');
-    console.log(token)
 
     axios.post(`${baseUrl}/auth/logout/`, null, {
-      headers: {Authorization: `JWT ${token}`}
+      headers: {Authorization: `Bearer ${token}`}
     })
       .then(() => {
           localStorage.removeItem("token");
           dispatch(logout())
         }
       )
-      .catch(e => setError(e))
+      .catch(e => setError(e.response.data.non_field_errors))
   }
 
   return (
     <div>
 
       {error &&
-        <h1 style={{color: "red"}}>Произошла ошибка {error.message}</h1>
+        <h1 style={{color: "red"}}>Произошла ошибка: {error}</h1>
       }
 
       {isAuthenticated ?

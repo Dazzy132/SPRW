@@ -1,11 +1,13 @@
-import React from 'react';
 import PostList from "../components/PostList";
+import {Container} from "@mui/material";
 
 const MainPage = () => {
   document.title = "Главная страница"
 
   return (
-    <PostList />
+    <Container maxWidth="sm">
+      <PostList />
+    </Container>
   );
 };
 

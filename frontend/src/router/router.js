@@ -1,6 +1,6 @@
 import MainPage from "../pages/MainPage";
-import PostList from "../components/PostList";
 import AuthPage from "../pages/AuthPage";
+import PostList from "../components/PostList";
 
 export const publicRoutes = [
   {path: "/", element: MainPage},
