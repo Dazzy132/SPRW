@@ -27,3 +27,10 @@ class Friends(models.Model):
             user_profile=self.friend_profile,
             friend_profile=self.user_profile
         )
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        Friends.objects.filter(
+            user_profile=self.friend_profile,
+            friend_profile=self.user_profile
+        ).delete()
