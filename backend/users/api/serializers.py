@@ -30,10 +30,15 @@ class ProfileSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Profile
-        fields = ['user', 'photo', 'profile_status', 'is_private']
+        fields = ['user_id', 'user', 'photo', 'profile_status', 'is_private']
 
 class FriendSerializer(serializers.ModelSerializer):
 
+
     class Meta:
         model = Friends
-        fields = ['friend_profile', 'application_status']
+        fields = ['id', 'user_profile', 'friend_profile', 'application_status']
+
+    # def get_id(self, obj):
+    #     # Возвращаем username пользователя вместо id
+    #     return obj.friend_profile.user.username

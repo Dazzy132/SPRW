@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from django.db import models
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Friends(models.Model):
     @dataclass
@@ -28,7 +30,7 @@ class Friends(models.Model):
     application_status = models.CharField(
         max_length=20,
         choices=APPLICSTION_STATUS_CHOISE,
-        default='заявка в ожидании')
+        default=APPLICSTION_STATUS.PENDING)
     
     class Meta:
         verbose_name = 'Друг'
@@ -39,21 +41,18 @@ class Friends(models.Model):
                 f'{self.friend_profile.user.username}')
     
     def save(self, *args, **kwargs):
-        if self.application_status == 'approved':
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+        if self.application_status == self.APPLICSTION_STATUS.APPROVED:
             Friends.objects.get_or_create(
                 user_profile=self.friend_profile,
                 friend_profile=self.user_profile,
-                application_status='approved'
+                application_status=self.APPLICSTION_STATUS.APPROVED
             )
+        if self.application_status == self.APPLICSTION_STATUS.DECLINE:
+            super().delete(*args, **kwargs)
+            Friends.objects.filter(
+                user_profile=self.friend_profile,
+                friend_profile=self.user_profile
+            ).delete()
 
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
-        Friends.objects.filter(
-            user_profile=self.friend_profile,
-            friend_profile=self.user_profile
-        ).delete()
-
-    @staticmethod
-    def get_incoming_requests(profile):
-        return Friends.objects.filter(friend_profile=profile, status='pending')
+    

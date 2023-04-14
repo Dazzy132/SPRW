@@ -29,39 +29,52 @@ class ProfileViewSet(ModelViewSet):
     queryset = Profile.objects.all()
     lookup_field = 'user__username'
 
-    @action(detail=True, methods=['POST'])
-    def add_to_friends(self, request, user__username):
-        friend_profile = get_object_or_404(Profile, user__username=user__username)
-        Friends.objects.create(
-            user_profile=request.user.profile,
-            friend_profile=friend_profile
-        )
-        return Response({'success': True})
+    # @action(detail=True, methods=['POST'])
+    # def add_to_friends(self, request, user__username):
+    #     friend_profile = get_object_or_404(Profile, user__username=user__username)
+    #     Friends.objects.create(
+    #         user_profile=request.user.profile,
+    #         friend_profile=friend_profile
+    #     )
+    #     return Response({'success': True})
 
-    @action(detail=True, methods=['DELETE'])
-    def delete_from_friends(self, request, user__username):
-        friend_profile = get_object_or_404(Profile, user__username=user__username)
-        Friends.objects.filter(user_profile=request.user.profile,
-            friend_profile=friend_profile).delete()
-        return Response({'success': True})
+    # @action(detail=True, methods=['DELETE'])
+    # def delete_from_friends(self, request, user__username):
+    #     friend_profile = get_object_or_404(Profile, user__username=user__username)
+    #     Friends.objects.filter(user_profile=request.user.profile,
+    #         friend_profile=friend_profile).delete()
+    #     return Response({'success': True})
     
 
 class FriendViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = FriendSerializer
-    queryset = Friends.objects.all()
+    model = Friends
+    lookup_field = 'friend_profile__user__username'
 
+    def get_queryset(self):
+        return Friends.objects.filter(
+            user_profile=self.request.user.profile,
+            application_status=self.model.APPLICSTION_STATUS.APPROVED)
 
     @action(detail=False, methods=['GET'])
     def incoming_requests(self, request):
-        profile = self.request.user.profile
-        friends = Friends.get_incoming_requests(profile)
-        serializer = self.get_serializer(friends, many=True)
+        incoming_requests = Friends.objects.filter(
+            user_profile=self.request.user.profile,
+            application_status=self.model.APPLICSTION_STATUS.PENDING)
+        serializer = self.get_serializer(incoming_requests, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['POST'])
-    def approve_request(self, request, pk=None):
-        friend = self.get_object()
-        friend.application_status = 'approved'
-        friend.save()
-        return Response({'success': True})
+    # @action(detail=True, methods=['POST'])
+    # def approve_request(self, request, friend_profile__user__username=None):
+    #     friend = self.get_object()
+    #     friend.application_status = 'approved'
+    #     friend.save()
+    #     return Response({'success': 'апва'})
+    
+    # @action(detail=True, methods=['POST'])
+    # def decline_request(self, request, friend_profile__user__username=None):
+    #     friend = self.get_object()
+    #     friend.application_status = 'decline'
+    #     friend.delete()
+    #     return Response({'success': 'апва'})        
