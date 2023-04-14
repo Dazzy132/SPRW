@@ -2,8 +2,6 @@ from dataclasses import dataclass
 
 from django.db import models
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class Friends(models.Model):
     @dataclass
@@ -11,10 +9,11 @@ class Friends(models.Model):
         APPROVED = 'approved'
         PENDING = 'pending'
         DECLINE = 'decline'
+
     APPLICSTION_STATUS_CHOISE = (
         (APPLICSTION_STATUS.APPROVED, 'заявка принята'),
         (APPLICSTION_STATUS.PENDING, 'заявка в ожидании'),
-        (APPLICSTION_STATUS.DECLINE, 'заявка отклонена')
+        (APPLICSTION_STATUS.DECLINE, 'заявка отклонена'),
     )
 
     user_profile = models.ForeignKey(
@@ -55,4 +54,9 @@ class Friends(models.Model):
                 friend_profile=self.user_profile
             ).delete()
 
-    
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        Friends.objects.filter(
+            user_profile=self.friend_profile,
+            friend_profile=self.user_profile
+        ).delete()

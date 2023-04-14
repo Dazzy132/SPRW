@@ -28,17 +28,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         default=serializers.CurrentUserDefault()
     )
+
     class Meta:
         model = Profile
         fields = ['user_id', 'user', 'photo', 'profile_status', 'is_private']
 
+
 class FriendSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = Friends
         fields = ['id', 'user_profile', 'friend_profile', 'application_status']
-
-    # def get_id(self, obj):
-    #     # Возвращаем username пользователя вместо id
-    #     return obj.friend_profile.user.username
