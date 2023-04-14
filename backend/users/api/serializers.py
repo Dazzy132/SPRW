@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from users.models.profile import Profile
+from users.models.friends import Friends
 User = get_user_model()
 
 
@@ -30,3 +31,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['user', 'photo', 'profile_status', 'is_private']
+
+class FriendSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Friends
+        fields = ['friend_profile', 'application_status']
