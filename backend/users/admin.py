@@ -19,5 +19,4 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Friends)
 class FriendsAdmin(admin.ModelAdmin):
-    list_display = ['user_profile', 'friend_profile']
-
+    list_display = ['user_profile', 'friend_request_sender']

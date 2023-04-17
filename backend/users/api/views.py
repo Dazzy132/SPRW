@@ -3,12 +3,18 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from users.api.serializers import ProfileSerializer, UserListSerializer, FriendSerializer
-from users.api.permissions import IsUserProfileOrAdminOrReadOly
-from users.models.profile import Profile
+from users.api.mixins import ListRetrieveUpdateDestroyViewSet
+from users.api.permissions import IsRequestUserOrReadOly
+from users.api.serializers import (FriendSerializer,
+                                   PublicProfileSerializer,
+                                   PrivateProfileSerializer,
+                                   UserListSerializer)
 from users.models.friends import Friends
+from users.models.profile import Profile
+
+
 User = get_user_model()
 
 
@@ -21,65 +27,93 @@ class UserViewSet(ReadOnlyModelViewSet):
     )
     def me(self, request):
         return Response(self.serializer_class(request.user).data)
-    
 
-class ProfileViewSet(ModelViewSet):
-    permission_classes = [IsUserProfileOrAdminOrReadOly]
-    serializer_class = ProfileSerializer
+
+class ProfileViewSet(ListRetrieveUpdateDestroyViewSet):
+    permission_classes = [IsRequestUserOrReadOly]
     queryset = Profile.objects.all()
     lookup_field = 'user__username'
 
+    def get_serializer_class(self):
+        if self.request.user.profile.is_private:
+            return PrivateProfileSerializer
+        return PublicProfileSerializer
+
     @action(detail=True, methods=['POST'])
     def add_to_friends(self, request, user__username):
-        friend_profile = get_object_or_404(Profile, user__username=user__username)
+        friend_request_receiver = get_object_or_404(
+            Profile,
+            user__username=user__username)
+        if friend_request_receiver == request.user.profile:
+            return Response({'error': 'Вы не можете добавить себя в друзья'})
+        if Friends.objects.filter(
+                application_status=Friends.APPLICSTION_STATUS.PENDING,
+                user_profile=friend_request_receiver,
+                friend_request_sender=request.user.profile).exists():
+            return Response(
+                {'error':
+                 ('Вы уже отправили пользователю '
+                  f'{friend_request_receiver} заявку на добавление в друзья')})
+        if Friends.objects.filter(
+                application_status=Friends.APPLICSTION_STATUS.PENDING,
+                user_profile=request.user.profile,
+                friend_request_sender=friend_request_receiver).exists():
+            return Response({'error':
+                             (f'{friend_request_receiver} уже отправил вам '
+                              'заявку на добавление в друзья')})
         Friends.objects.create(
-            user_profile=request.user.profile,
-            friend_profile=friend_profile
+            user_profile=friend_request_receiver,
+            friend_request_sender=request.user.profile
         )
-        return Response({'success': True})
+        return Response({'success':
+                         ('Заявка на добавление в друзья отправлена '
+                          f'пользователю {friend_request_receiver}')})
 
-class FriendViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated]
+
+class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
+    permission_classes = [IsRequestUserOrReadOly]
     serializer_class = FriendSerializer
     model = Friends
-    lookup_field = 'friend_profile__user__username'
+    lookup_field = 'friend_request_sender__user__username'
 
     def get_queryset(self):
-        if self.action == 'approve_request':
-            return Friends.objects.filter(
+        if self.action in ['approve_request',
+                           'decline_request',
+                           'incoming_requests']:
+            return self.model.objects.filter(
                 user_profile=self.request.user.profile,
                 application_status=self.model.APPLICSTION_STATUS.PENDING)
-        return Friends.objects.filter(
+
+        elif self.action == 'out_requests':
+            return self.model.objects.filter(
+                friend_request_sender=self.request.user.profile,
+                application_status=self.model.APPLICSTION_STATUS.PENDING)
+        return self.model.objects.filter(
             user_profile=self.request.user.profile,
             application_status=self.model.APPLICSTION_STATUS.APPROVED)
 
     @action(detail=False, methods=['GET'])
     def incoming_requests(self, request):
-        incoming_requests = Friends.objects.filter(
-            user_profile=self.request.user.profile,
-            application_status=self.model.APPLICSTION_STATUS.PENDING)
-        serializer = self.get_serializer(incoming_requests, many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['GET'])
     def out_requests(self, request):
-        out_requests = Friends.objects.filter(
-            friend_profile=self.request.user.profile,
-            application_status=self.model.APPLICSTION_STATUS.PENDING)
-        serializer = self.get_serializer(out_requests, many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
-
     @action(detail=True, methods=['POST'])
-    def approve_request(self, request, friend_profile__user__username=None):
+    def approve_request(self, request,
+                        friend_request_sender__user__username=None):
         friend = self.get_object()
-        friend.application_status = 'approved'
+        friend.application_status = self.model.APPLICSTION_STATUS.APPROVED
         friend.save()
-        return Response({'success': 'апва'})
-    
-    @action(detail=True, methods=['POST'])
-    def decline_request(self, request, friend_profile__user__username=None):
+        return Response({'success':
+                         f'Пользователь {friend} добавлен в друзья'})
+
+    @action(detail=True, methods=['DELETE'])
+    def decline_request(self, request,
+                        friend_request_sender__user__username=None):
         friend = self.get_object()
-        friend.application_status = 'decline'
         friend.delete()
-        return Response({'success': 'апва'})        
+        return Response({'success': f'Заявка пользователя {friend} удалена'})
