@@ -16,6 +16,12 @@ import customTheme from '../styles/login/theme';
 import GoogleIcon from '../styles/login/GoogleIcon';
 import {FormControlLabel} from "@mui/material";
 import {Radio, RadioGroup} from "@mui/joy";
+import axios from "axios";
+import {baseUrl} from "../api/routes";
+import {useEffect, useState} from "react";
+import {Navigate, useNavigate} from "react-router-dom";
+import getUser from "../api";
+import Loader from "../components/Loader";
 
 
 function ColorSchemeToggle({onClick, ...props}) {
@@ -51,12 +57,56 @@ function ColorSchemeToggle({onClick, ...props}) {
 
 export default function SignUpTemplate() {
 
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRegistered, setIsRegistered] = useState(false)
+  const history = useNavigate()
+
+  useEffect(() => {
+    getUser()
+      .then(response => {
+        if (response.status !== 401) {
+          history('/')
+        }
+      })
+      .catch(e => null)
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [])
+
   function registrationButton(event) {
     event.preventDefault()
 
     const formElements = event.currentTarget.elements
-    console.log(formElements)
+    const data = {
+      email: formElements.email.value,
+      username: formElements.username.value,
+      first_name: formElements.first_name.value,
+      last_name: formElements.last_name.value,
+      gender: formElements.gender.value,
+      password1: formElements.password1.value,
+      password2: formElements.password2.value,
+    }
+
+    axios.post(`${baseUrl}/auth/registration/`, data)
+      .then(response => {
+        setIsRegistered(true)
+      })
+      .catch(e => {
+        const firstError = Object.values(e.response.data)[0][0];
+        setError(firstError)
+      })
   }
+
+  if (isLoading) {
+    return <Loader/>
+  }
+
+  if (isRegistered) {
+    return <Navigate to="/login" state={{isRegistered: true}}/>
+  }
+
 
   return (
     <CssVarsProvider
@@ -149,11 +199,11 @@ export default function SignUpTemplate() {
               </Typography>
             </div>
 
-            {/*{error &&*/}
-            {/*  <Typography variant="body2" sx={{backgroundColor: 'rgba(248,43,43,0.57)', color: 'white', mb: 2, p: 1}} textAlign="center">*/}
-            {/*    {error}*/}
-            {/*  </Typography>*/}
-            {/*}*/}
+            {error &&
+              <Typography variant="body2" sx={{backgroundColor: 'rgba(248,43,43,0.57)', color: 'white', mb: 2, p: 1}} textAlign="center">
+                {error}
+              </Typography>
+            }
 
             <form method="post" onSubmit={registrationButton}>
               <FormControl required>
@@ -187,8 +237,8 @@ export default function SignUpTemplate() {
                   name="row-radio-buttons-group"
                   sx={{paddingLeft: "10px"}}
                 >
-                  <FormControlLabel value="male" control={<Radio />} label="Мужской" />
-                  <FormControlLabel value="female" control={<Radio />} label="Женский" />
+                  <FormControlLabel name="gender" value="male" control={<Radio />} label="Мужской" />
+                  <FormControlLabel name="gender" value="female" control={<Radio />} label="Женский" />
                 </RadioGroup>
               </FormControl>
 
@@ -209,7 +259,7 @@ export default function SignUpTemplate() {
                   alignItems: 'center',
                 }}
               >
-                <Link fontSize="sm" href="#replace-with-a-link"
+                <Link fontSize="sm" href="/login/"
                       fontWeight="lg">
                   У меня уже есть аккаунт
                 </Link>

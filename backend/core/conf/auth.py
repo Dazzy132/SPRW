@@ -22,6 +22,7 @@ REST_AUTH = {
     'JWT_AUTH_RETURN_EXPIRATION': True,
     'JWT_AUTH_REFRESH_COOKIE': "my-refresh-cookie",
     'REGISTER_SERIALIZER': 'a12n.api.serializers.CustomRegisterSerializer',
+    "PASSWORD_RESET_SERIALIZER": "a12n.api.serializers.CustomPasswordResetSerializer",
     "OLD_PASSWORD_FIELD_ENABLED": True,
 }
 

@@ -1,25 +1,26 @@
-import * as React from 'react';
-import {useEffect, useState} from 'react';
-import {CssVarsProvider, useColorScheme} from '@mui/joy/styles';
-import GlobalStyles from '@mui/joy/GlobalStyles';
-import CssBaseline from '@mui/joy/CssBaseline';
-import Box from '@mui/joy/Box';
-import Button from '@mui/joy/Button';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel, {formLabelClasses} from '@mui/joy/FormLabel';
-import IconButton from '@mui/joy/IconButton';
-import Link from '@mui/joy/Link';
-import Input from '@mui/joy/Input';
-import Typography from '@mui/joy/Typography';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import customTheme from '../styles/login/theme';
-import GoogleIcon from '../styles/login/GoogleIcon';
+import React, {useContext, useEffect, useState} from 'react';
 import axios from "axios";
 import {baseUrl} from "../api/routes";
-import {useLocation, useNavigate} from "react-router-dom";
-import Loader from "../components/Loader";
+import AuthContext from "../context/AuthContext";
+import UserContext from "../context/UserContext";
+import {Navigate, useNavigate} from "react-router-dom";
+import {CssVarsProvider, useColorScheme} from "@mui/joy/styles";
+import customTheme from "../styles/login/theme";
+import CssBaseline from "@mui/joy/CssBaseline";
+import GlobalStyles from "@mui/joy/GlobalStyles";
+import Box from "@mui/joy/Box";
+import Typography from "@mui/joy/Typography";
+import FormLabel, {formLabelClasses} from "@mui/joy/FormLabel";
+import FormControl from "@mui/joy/FormControl";
+import Input from "@mui/joy/Input";
+import Link from "@mui/joy/Link";
+import Button from "@mui/joy/Button";
+import GoogleIcon from "../styles/login/GoogleIcon";
+import IconButton from "@mui/joy/IconButton";
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
+import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import getUser from "../api";
+import Loader from "../components/Loader";
 
 
 function ColorSchemeToggle({onClick, ...props}) {
@@ -53,19 +54,15 @@ function ColorSchemeToggle({onClick, ...props}) {
 }
 
 
-export default function JoySignInSideTemplate() {
-
-  const location = useLocation()
-  const isRegistered = location.state?.isRegistered;
-
+const ResetAccountPage = () => {
   const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
   const history = useNavigate()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     getUser()
       .then(response => {
-        if (response.status === 200) {
+        if (response.status !== 200) {
           history('/')
         }
       })
@@ -75,30 +72,24 @@ export default function JoySignInSideTemplate() {
       })
   }, [])
 
-  function loginButton(event) {
-    event.preventDefault()
+  function resetAccountButton(e) {
+    e.preventDefault()
 
-    const formElements = event.currentTarget.elements;
-    const data = {
-      password: formElements.password.value,
-    };
+		const formElements = e.currentTarget.elements
+	  const data = {
+			email: formElements.email.value
+	  }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(formElements.loginOrEmail.value)) {
-      data["email"] = formElements.loginOrEmail.value
-    } else {
-      data["username"] = formElements.loginOrEmail.value
-    }
-
-    axios.post(`${baseUrl}/auth/login/`, data)
-      .then(response => {
-        localStorage.setItem("token", response.data["access_token"])
-        history('/')
-      })
-      .catch(e => {
-        const firstError = Object.values(e.response.data)[0][0];
-        setError(firstError)
-      })
+    axios.post(`${baseUrl}/auth/password/reset/`, data)
+	    .then(response => {
+		    console.log('---------------')
+		    console.log(response)
+		    console.log(response.data)
+	    })
+	    .catch(e => {
+		    const firstError = Object.values(e.response.data)[0][0];
+		    setError(firstError)
+	    })
   }
 
   if (isLoading) {
@@ -161,7 +152,7 @@ export default function JoySignInSideTemplate() {
               justifyContent: 'space-between',
             }}
           >
-            <Typography fontWeight="lg"><Link ></Link></Typography>
+            <Typography fontWeight="lg">SPRW</Typography>
             <ColorSchemeToggle/>
           </Box>
           <Box
@@ -173,7 +164,7 @@ export default function JoySignInSideTemplate() {
               display: 'flex',
               flexDirection: 'column',
               gap: 2,
-              width: 400,
+              width: 450,
               maxWidth: '100%',
               mx: 'auto',
               borderRadius: 'sm',
@@ -188,24 +179,9 @@ export default function JoySignInSideTemplate() {
             }}
           >
             <div>
-              <Typography component="h2" fontSize="xl2" fontWeight="lg"
-                          textAlign="center">
-                Добро пожаловать
+              <Typography component="h2" fontSize="xl2" fontWeight="lg">
+                Восстановление доступа к аккаунту
               </Typography>
-              <Typography level="body2" sx={{my: 1, mb: 3}}
-                          textAlign="center">
-                Давайте начнем! Пожалуйста, введите свои данные.
-              </Typography>
-              {isRegistered &&
-                <Typography variant="body2" sx={{
-                  backgroundColor: 'rgba(239,152,20,0.76)',
-                  color: 'white',
-                  mb: 2,
-                  p: 1
-                }} textAlign="center">
-                  Сообщение с подтверждением аккаунта было выслано вам на почту!
-                </Typography>
-              }
             </div>
 
             {error &&
@@ -219,17 +195,12 @@ export default function JoySignInSideTemplate() {
               </Typography>
             }
 
-            <form method="post" onSubmit={loginButton}>
-              <FormControl required>
-                <FormLabel>Логин или почта</FormLabel>
-                <Input placeholder="Введите логин или почту" type="text"
-                       name="loginOrEmail"/>
-              </FormControl>
-              <FormControl required>
-                <FormLabel>Пароль</FormLabel>
-                <Input placeholder="•••••••" type="password"
-                       name="password"/>
-              </FormControl>
+            <form method="post" onSubmit={resetAccountButton}>
+	            <FormControl required>
+		            <FormLabel>Почта</FormLabel>
+		            <Input placeholder="Введите почту привязанную к аккаунту" type="text"
+		                   name="email"/>
+	            </FormControl>
               <Box
                 sx={{
                   display: 'flex',
@@ -237,27 +208,12 @@ export default function JoySignInSideTemplate() {
                   alignItems: 'center',
                 }}
               >
-                <Link fontSize="sm" href="/signup/"
-                      fontWeight="lg">
-                  Зарегистрироваться
-                </Link>
-                <Link fontSize="sm" href="#replace-with-a-link"
-                      fontWeight="lg">
-                  Не помню пароль
-                </Link>
               </Box>
               <Button type="submit" fullWidth>
-                Войти
+                Восстановить
               </Button>
             </form>
-            <Button
-              variant="outlined"
-              color="neutral"
-              fullWidth
-              startDecorator={<GoogleIcon/>}
-            >
-              Войти с помощью Google
-            </Button>
+
           </Box>
           <Box component="footer" sx={{py: 3}}>
             <Typography level="body3" textAlign="center">
@@ -269,4 +225,7 @@ export default function JoySignInSideTemplate() {
 
     </CssVarsProvider>
   );
-}
+
+};
+
+export default ResetAccountPage;

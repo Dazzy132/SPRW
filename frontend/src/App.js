@@ -24,7 +24,7 @@ function App() {
       }
     }).then(response => response.data)
       .catch(error => {
-        history('/auth/')
+        history('/login/')
         setLoggedIn(false)
       })
       .finally(() => setIsLoading(false))
