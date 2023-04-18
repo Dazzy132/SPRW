@@ -16,6 +16,7 @@ import * as React from "react";
 import {styled} from "@mui/material/styles";
 import {useState} from "react";
 
+
 const ExpandMore = styled((props) => {
   const {expand, ...other} = props;
   return <IconButton {...other} />;
@@ -32,7 +33,6 @@ const PostItem = ({post}) => {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  console.log(post)
 
   return (
     <Card sx={{maxWidth: 500}} style={{marginBottom: 15}}>
@@ -86,10 +86,10 @@ const PostItem = ({post}) => {
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          {post.comments < 0
+          {post.comments.length <= 0
             ? <Typography paragraph>Комментариев нет!</Typography>
             : post.comments.map(comment =>
-            <div style={{marginBottom: 20}}>
+            <div key={comment.id} style={{marginBottom: 20}}>
               <div>Автор: {comment.author}</div>
               <div>Комментарий: {comment.text}</div>
             </div>
@@ -101,3 +101,4 @@ const PostItem = ({post}) => {
 };
 
 export default PostItem;
+

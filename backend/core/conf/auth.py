@@ -2,7 +2,7 @@ from datetime import timedelta
 
 AUTH_USER_MODEL = 'users.User'
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email | username'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_UNIQUE_EMAIL = True
@@ -16,20 +16,20 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 REST_AUTH = {
-    'JWT_AUTH_COOKIE': 'SPRW-AUTH',
     'USE_JWT': True,
+    "JWT_AUTH_HTTPONLY": False,
+    'JWT_AUTH_COOKIE': 'SPRW-AUTH',
+    'JWT_AUTH_RETURN_EXPIRATION': True,
+    'JWT_AUTH_REFRESH_COOKIE': "my-refresh-cookie",
     'REGISTER_SERIALIZER': 'a12n.api.serializers.CustomRegisterSerializer',
-    "OLD_PASSWORD_FIELD_ENABLED": True
+    "OLD_PASSWORD_FIELD_ENABLED": True,
 }
 
-# JWT_AUTH = {
-#     "JWT_EXPIRATION_DELTA": timedelta(days=14),
-#     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=21),
-#     "JWT_ALLOW_REFRESH": True,
-#     "JWT_ISSUER": "education-backend",
-#     "JWT_ALGORITHM": "RS256",
-#     "JWT_PAYLOAD_HANDLER": "a12n.jwt.payload_handler",
-# }
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=14),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+}
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},

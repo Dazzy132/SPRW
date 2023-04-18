@@ -1,29 +1,29 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import {useEffect, useState} from "react";
 import {baseUrl} from "../api/routes";
 import useSWR from "swr";
-import {useDispatch} from "react-redux";
-import {loginSuccess} from "../store/reducers/auth/actions";
 import PostItem from "./PostItem";
+import {CircularProgress, Stack} from "@mui/material";
+
 
 export default function PostList() {
 
   const fetcher = (...args) => fetch(...args).then(res => res.json())
   const {data, error, isLoading, mutate} = useSWR(`${baseUrl}/posts/`, fetcher)
-  const dispatch = useDispatch()
-
-  // TODO: Сделать глобально
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      dispatch(loginSuccess(token));
-    }
-  }, [dispatch]);
-
 
   if (isLoading) {
-    return <h1>Идёт загрузка...</h1>
+    return (
+      <Stack
+        sx={{
+          color: 'brown.500',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress color="inherit" sx={{margin: 'auto'}}/>
+      </Stack>
+    )
   }
 
   if (error) {
@@ -37,8 +37,8 @@ export default function PostList() {
   return (
     <div>
       {data.length === 0
-      ? <Typography align={"center"}>Постов нет</Typography>
-      : data.map(post => <PostItem post={post}/>)
+        ? <Typography align={"center"}>Постов нет</Typography>
+        : data.map(post => <PostItem key={post.id} post={post}/>)
       }
     </div>
 
