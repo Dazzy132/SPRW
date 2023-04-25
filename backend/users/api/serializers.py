@@ -69,4 +69,3 @@ class FriendSerializer(serializers.ModelSerializer):
                                                'Это поле обязательно'})
         instance.save(update_fields=['application_status'])
         return instance
-

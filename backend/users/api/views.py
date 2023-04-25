@@ -4,10 +4,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from django.db import IntegrityError
 from rest_framework import status
 from users.api.mixins import ListRetrieveUpdateDestroyViewSet
-from users.api.permissions import IsRequestUserOrReadOly
+from users.api.permissions import (IsRequestUserOrReadOlyFriends,
+                                   IsRequestUserOrReadOlyProfile)
 from users.api.serializers import (FriendSerializer,
                                    ProfileSerializer,
                                    UserListSerializer)
@@ -29,7 +29,7 @@ class UserViewSet(ReadOnlyModelViewSet):
 
 
 class ProfileViewSet(ListRetrieveUpdateDestroyViewSet):
-    permission_classes = [IsRequestUserOrReadOly]
+    permission_classes = [IsRequestUserOrReadOlyProfile]
     serializer_class = ProfileSerializer
     queryset = Profile.objects.select_related('user')
     lookup_field = 'user__username'
@@ -61,10 +61,10 @@ class ProfileViewSet(ListRetrieveUpdateDestroyViewSet):
 
 
 class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
-    permission_classes = [IsRequestUserOrReadOly]
+    permission_classes = [IsRequestUserOrReadOlyFriends]
     serializer_class = FriendSerializer
     model = Friends
-    lookup_field = 'user_profile__user__username'
+    lookup_field = 'friend_request_sender__user__username'
 
     def get_queryset(self):
         if self.action in ['approve_request',
@@ -94,7 +94,7 @@ class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
 
     @action(detail=True, methods=['POST'])
     def approve_request(self, request,
-                        user_profile__user__username=None):
+                        friend_request_sender__user__username=None):
         friend = self.get_object()
         friend.application_status = self.model.APPLICATION_STATUS.APPROVED
         friend.save()
@@ -103,7 +103,7 @@ class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
 
     @action(detail=True, methods=['DELETE'])
     def decline_request(self, request,
-                        user_profile__user__username=None):
+                        friend_request_sender__user__username=None):
         friend = self.get_object()
         friend.delete()
         return Response({'success': f'Заявка пользователя {friend} удалена'})
