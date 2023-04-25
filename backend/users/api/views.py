@@ -4,12 +4,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-
+from django.db import IntegrityError
+from rest_framework import status
 from users.api.mixins import ListRetrieveUpdateDestroyViewSet
 from users.api.permissions import IsRequestUserOrReadOly
 from users.api.serializers import (FriendSerializer,
-                                   PublicProfileSerializer,
-                                   PrivateProfileSerializer,
+                                   ProfileSerializer,
                                    UserListSerializer)
 from users.models.friends import Friends
 from users.models.profile import Profile
@@ -22,52 +22,42 @@ class UserViewSet(ReadOnlyModelViewSet):
     serializer_class = UserListSerializer
     queryset = User.objects.all()
 
-    @action(
-        detail=False, methods=["GET"], permission_classes={IsAuthenticated}
-    )
+    @action(detail=False, methods=["GET"],
+            permission_classes={IsAuthenticated})
     def me(self, request):
         return Response(self.serializer_class(request.user).data)
 
 
 class ProfileViewSet(ListRetrieveUpdateDestroyViewSet):
     permission_classes = [IsRequestUserOrReadOly]
-    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.select_related('user')
     lookup_field = 'user__username'
-
-    def get_serializer_class(self):
-        if self.request.user.profile.is_private:
-            return PrivateProfileSerializer
-        return PublicProfileSerializer
 
     @action(detail=True, methods=['POST'])
     def add_to_friends(self, request, user__username):
         friend_request_receiver = get_object_or_404(
-            Profile,
-            user__username=user__username)
+            Profile, user__username=user__username)
         if friend_request_receiver == request.user.profile:
-            return Response({'error': 'Вы не можете добавить себя в друзья'})
-        if Friends.objects.filter(
-                application_status=Friends.APPLICSTION_STATUS.PENDING,
-                user_profile=friend_request_receiver,
-                friend_request_sender=request.user.profile).exists():
-            return Response(
-                {'error':
-                 ('Вы уже отправили пользователю '
-                  f'{friend_request_receiver} заявку на добавление в друзья')})
-        if Friends.objects.filter(
-                application_status=Friends.APPLICSTION_STATUS.PENDING,
-                user_profile=request.user.profile,
-                friend_request_sender=friend_request_receiver).exists():
+            return Response({'error': 'Вы не можете добавить себя в друзья'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if self.get_serializer().is_friend_request_already_sent(
+                friend_request_receiver, request.user):
             return Response({'error':
-                             (f'{friend_request_receiver} уже отправил вам '
-                              'заявку на добавление в друзья')})
-        Friends.objects.create(
-            user_profile=friend_request_receiver,
-            friend_request_sender=request.user.profile
-        )
-        return Response({'success':
-                         ('Заявка на добавление в друзья отправлена '
-                          f'пользователю {friend_request_receiver}')})
+                             (f'{friend_request_receiver} уже отправил '
+                              'вам заявку на добавление в друзья')},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if self.get_serializer().add_friend_request(friend_request_receiver,
+                                                    request.user):
+            return Response({'success':
+                             ('Заявка на добавление в друзья отправлена '
+                              f'пользователю {friend_request_receiver}')},
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error':
+                             ('Вы уже отправили заявку пользователю '
+                              f'{friend_request_receiver}')},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
@@ -82,15 +72,15 @@ class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
                            'incoming_requests']:
             return self.model.objects.filter(
                 user_profile=self.request.user.profile,
-                application_status=self.model.APPLICSTION_STATUS.PENDING)
+                application_status=self.model.APPLICATION_STATUS.PENDING)
 
         elif self.action == 'out_requests':
             return self.model.objects.filter(
                 friend_request_sender=self.request.user.profile,
-                application_status=self.model.APPLICSTION_STATUS.PENDING)
+                application_status=self.model.APPLICATION_STATUS.PENDING)
         return self.model.objects.filter(
             user_profile=self.request.user.profile,
-            application_status=self.model.APPLICSTION_STATUS.APPROVED)
+            application_status=self.model.APPLICATION_STATUS.APPROVED)
 
     @action(detail=False, methods=['GET'])
     def incoming_requests(self, request):
@@ -106,7 +96,7 @@ class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
     def approve_request(self, request,
                         user_profile__user__username=None):
         friend = self.get_object()
-        friend.application_status = self.model.APPLICSTION_STATUS.APPROVED
+        friend.application_status = self.model.APPLICATION_STATUS.APPROVED
         friend.save()
         return Response({'success':
                          f'Пользователь {friend} добавлен в друзья'})
