@@ -59,6 +59,9 @@ class Post(Authored, Timestamped, LikesRelated, ViewsRelated):
         related_name="posts",
         blank=True,
     )
+    group = models.ForeignKey('groups.Groups', on_delete=models.CASCADE,
+                              blank=True, null=True,
+                              related_name='posts')
 
     def __str__(self):
         return f"{self.uuid}"
