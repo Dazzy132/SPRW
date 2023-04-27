@@ -7,7 +7,6 @@
 """
 
 from posts.models.comment import Comment
-from posts.models.complaints import CommentComplaint, Complaints, PostComplaint
 from posts.models.fields import LikesRelated, ViewsRelated
 from posts.models.post import Post, PostLike
 from posts.models.tag import Tag
@@ -16,11 +15,7 @@ __all__ = [
     "Post",
     "PostLike",
     "Comment",
-    "Complaints",
-    "CommentComplaint",
-    "PostComplaint",
     "Tag",
-
     "LikesRelated",
     "ViewsRelated",
 ]

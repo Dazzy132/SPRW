@@ -43,30 +43,5 @@ class Complaints(models.Model):
         on_delete=models.CASCADE,
         verbose_name='пользователь оставивший жалобу')
 
-
-class PostComplaint(Complaints):
-    post = models.ForeignKey(
-        'posts.Post',
-        on_delete=models.CASCADE,
-        verbose_name='пост на который поступила жалоба')
-
     class Meta:
-        verbose_name = 'Жалоба на пост'
-        verbose_name_plural = 'Жалобы на пост'
-
-    def __str__(self):
-        return f"Жалоба на пост: {self.post}"
-
-
-class CommentComplaint(Complaints):
-    comment = models.ForeignKey(
-        'posts.Comment',
-        on_delete=models.CASCADE,
-        verbose_name='комментарий на который поступила жалоба')
-
-    class Meta:
-        verbose_name = 'Жалоба на комментарий'
-        verbose_name_plural = 'Жалобы на комментарии'
-
-    def __str__(self):
-        return f"Жалоба на комментарий: {self.comment}"
+        abstract = True
