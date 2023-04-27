@@ -41,5 +41,5 @@ class Groups(models.Model):
         verbose_name_plural = 'Пользовательские группы'
 
     def __str__(self):
-        return self.name
+        return (f"ID: {self.pk} Название: {self.name}")
 

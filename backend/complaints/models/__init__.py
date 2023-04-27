@@ -1,11 +1,12 @@
 from complaints.models.complaints import Complaints
-from complaints.models.post_complaint import PostComplaint
 from complaints.models.comment_complaint import CommentComplaint
-
+from complaints.models.group_complaint import GroupComplaint
+from complaints.models.post_complaint import PostComplaint
 
 
 __all__ = [
     'Complaints',
-    'PostComplaint',
-    'CommentComplaint'
+    'CommentComplaint',
+    'GroupComplaint',
+    'PostComplaint'
 ]

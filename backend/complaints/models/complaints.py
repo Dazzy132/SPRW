@@ -36,7 +36,7 @@ class Complaints(models.Model):
     complaint_status = models.CharField(
         'Статус жалобы',
         choices=COMPLAINT_STATUS_CHOISE,
-        max_length=200, default='Жалоба на рассмотрении')
+        max_length=200, default=COMPLAINT_STATUS.IN_PROCESS)
 
     user = models.ForeignKey(
         get_user_model(),

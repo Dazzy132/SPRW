@@ -4,8 +4,9 @@ from django.shortcuts import redirect, render
 from django.urls import path
 
 from complaints.models.complaints import Complaints
-from complaints.models.post_complaint import PostComplaint
 from complaints.models.comment_complaint import CommentComplaint
+from complaints.models.group_complaint import GroupComplaint
+from complaints.models.post_complaint import PostComplaint
 
 
 class ComplainAdmin(admin.ModelAdmin):
@@ -46,3 +47,8 @@ class CommentComplaintAdmin(ComplainAdmin):
 @admin.register(PostComplaint)
 class PostComplaintAdmin(ComplainAdmin):
     list_display = ['post'] + ComplainAdmin.list_display
+
+
+@admin.register(GroupComplaint)
+class GroupComplaintAdmin(ComplainAdmin):
+    list_display = ['group'] + ComplainAdmin.list_display

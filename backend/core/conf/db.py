@@ -9,7 +9,7 @@ if env('DEBUG'):
     DATABASES = {
         "default": {
             "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
-            "NAME": os.getenv("DB_NAME", default="our_project"),
+            "NAME": os.getenv("DB_NAME", default="isour_project"),
             "USER": os.getenv("POSTGRES_USER", default="Admin"),
             "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="Admin"),
             "HOST": os.getenv("DB_HOST", default="127.0.0.1"),
