@@ -6,16 +6,16 @@ from complaints.models.post_complaint import PostComplaint
 
 
 class ComplaintSerializer(serializers.ModelSerializer):
+    class Meta:
+        abstract = True
+        fields = ('complaint',)
+
     def create(self, validated_data):
         user = self.context['request'].user
         if self.Meta.model.objects.filter(user=user,
                                           **validated_data).exists():
             raise serializers.ValidationError('вы уже оставили жалобу')
         return self.Meta.model.objects.create(user=user, **validated_data)
-
-    class Meta:
-        abstract = True
-        fields = ('complaint',)
 
 
 class PostComplaintSerializer(ComplaintSerializer):
