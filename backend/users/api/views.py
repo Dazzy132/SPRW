@@ -8,7 +8,8 @@ from rest_framework import status
 from users.api.mixins import ListRetrieveUpdateDestroyViewSet
 from users.api.permissions import (IsRequestUserOrReadOlyFriends,
                                    IsRequestUserOrReadOlyProfile)
-from users.api.serializers import (FriendSerializer,
+from users.api.serializers import (AddToFriendsSerializer,
+                                   FriendSerializer,
                                    ProfileSerializer,
                                    UserListSerializer)
 from users.models.friends import Friends
@@ -30,34 +31,26 @@ class UserViewSet(ReadOnlyModelViewSet):
 
 class ProfileViewSet(ListRetrieveUpdateDestroyViewSet):
     permission_classes = [IsRequestUserOrReadOlyProfile]
-    serializer_class = ProfileSerializer
     queryset = Profile.objects.select_related('user')
     lookup_field = 'user__username'
+
+    def get_serializer_class(self):
+        if self.action == 'add_to_friends':
+            return AddToFriendsSerializer
+        return ProfileSerializer
 
     @action(detail=True, methods=['POST'])
     def add_to_friends(self, request, user__username):
         friend_request_receiver = get_object_or_404(
             Profile, user__username=user__username)
-        if friend_request_receiver == request.user.profile:
-            return Response({'error': 'Вы не можете добавить себя в друзья'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        if self.get_serializer().is_friend_request_already_sent(
-                friend_request_receiver, request.user):
-            return Response({'error':
-                             (f'{friend_request_receiver} уже отправил '
-                              'вам заявку на добавление в друзья')},
-                            status=status.HTTP_400_BAD_REQUEST)
-        if self.get_serializer().add_friend_request(friend_request_receiver,
-                                                    request.user):
-            return Response({'success':
-                             ('Заявка на добавление в друзья отправлена '
-                              f'пользователю {friend_request_receiver}')},
-                            status=status.HTTP_201_CREATED)
-        else:
-            return Response({'error':
-                             ('Вы уже отправили заявку пользователю '
-                              f'{friend_request_receiver}')},
-                            status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(
+            data={'user_profile': friend_request_receiver.pk,
+                  'friend_request_sender': request.user.profile.pk})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {'success': 'Заявку на добавление в друзья отправлена '
+                        f'пользователю {friend_request_receiver}'})
 
 
 class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
@@ -92,7 +85,7 @@ class FriendViewSet(ListRetrieveUpdateDestroyViewSet):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['POST'])
+    @action(detail=True, methods=['PATCH'])
     def approve_request(self, request,
                         friend_request_sender__user__username=None):
         friend = self.get_object()

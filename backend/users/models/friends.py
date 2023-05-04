@@ -8,7 +8,6 @@ class Friends(models.Model):
     class APPLICATION_STATUS:
         APPROVED = 'approved'
         PENDING = 'pending'
-        DECLINE = 'decline'
 
     APPLICATION_STATUS_CHOISE = (
         (APPLICATION_STATUS.APPROVED, 'заявка принята'),
@@ -33,7 +32,7 @@ class Friends(models.Model):
     class Meta:
         verbose_name = 'Друг'
         verbose_name_plural = 'Друзья'
-        unique_together = ('user_profile', 'friend_request_sender')
+
 
     def __str__(self):
         return (f'{self.friend_request_sender.user.username}')
