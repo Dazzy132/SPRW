@@ -17,5 +17,5 @@ class IsRequestUserOrReadOlyFriends(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return request.user.is_authenticated and (
-            obj.user_profile__user__username == request.user.username
+            obj.user_profile == request.user.profile
             or request.method in SAFE_METHODS)

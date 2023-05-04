@@ -13,7 +13,6 @@ class Friends(models.Model):
     APPLICATION_STATUS_CHOISE = (
         (APPLICATION_STATUS.APPROVED, 'заявка принята'),
         (APPLICATION_STATUS.PENDING, 'заявка в ожидании'),
-        (APPLICATION_STATUS.DECLINE, 'заявка отклонена'),
     )
 
     user_profile = models.ForeignKey(
@@ -38,25 +37,3 @@ class Friends(models.Model):
 
     def __str__(self):
         return (f'{self.friend_request_sender.user.username}')
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.application_status == self.APPLICATION_STATUS.APPROVED:
-            Friends.objects.get_or_create(
-                user_profile=self.friend_request_sender,
-                friend_request_sender=self.user_profile,
-                application_status=self.APPLICATION_STATUS.APPROVED
-            )
-        if self.application_status == self.APPLICATION_STATUS.DECLINE:
-            super().delete(*args, **kwargs)
-            Friends.objects.filter(
-                user_profile=self.friend_request_sender,
-                friend_request_sender=self.user_profile
-            ).delete()
-
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
-        Friends.objects.filter(
-            user_profile=self.friend_request_sender,
-            friend_request_sender=self.user_profile
-        ).delete()
