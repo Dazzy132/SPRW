@@ -7,7 +7,7 @@ from complaints.models.complaints import Complaints
 from complaints.models.comment_complaint import CommentComplaint
 from complaints.models.group_complaint import GroupComplaint
 from complaints.models.post_complaint import PostComplaint
-
+from complaints.models.profile_complaint import ProfileComplaint
 
 class ComplainAdmin(admin.ModelAdmin):
     list_display = ['id', 'complaint', 'complaint_status', 'user']
@@ -44,11 +44,16 @@ class CommentComplaintAdmin(ComplainAdmin):
     list_display = ['comment'] + ComplainAdmin.list_display
 
 
+@admin.register(GroupComplaint)
+class GroupComplaintAdmin(ComplainAdmin):
+    list_display = ['group'] + ComplainAdmin.list_display
+
+
 @admin.register(PostComplaint)
 class PostComplaintAdmin(ComplainAdmin):
     list_display = ['post'] + ComplainAdmin.list_display
 
 
-@admin.register(GroupComplaint)
-class GroupComplaintAdmin(ComplainAdmin):
-    list_display = ['group'] + ComplainAdmin.list_display
+@admin.register(ProfileComplaint)
+class ProfileComplaintAdmin(ComplainAdmin):
+    list_display = ['profile'] + ComplainAdmin.list_display

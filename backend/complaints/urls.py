@@ -13,4 +13,7 @@ urlpatterns = [
     path('postcomplaint/create/',
          views.PostComplaintCreateAPIView.as_view(),
          name='post_complaint_create'),
+    path('profilecomplaint/create/',
+         views.ProfileComplaintCreateAPIView.as_view(),
+         name='profile_complaint_create')
 ]
