@@ -51,6 +51,11 @@ class ProfileViewSet(ListRetrieveUpdateDestroyViewSet):
         return Response(
             {'success': 'Заявку на добавление в друзья отправлена '
                         f'пользователю {friend_request_receiver}'})
+    @action(detail=True, methods=['GET'])
+    def friends(self, request, user__username):
+        user = get_object_or_404(Profile, user__username=user__username)
+        serializer = FriendSerializer(Friends.objects.filter(user_profile=user), many=True)
+        return Response(serializer.data)
 
 
 class FriendViewSet(ListRetrieveUpdateDestroyViewSet):

@@ -15,7 +15,8 @@ class ComplaintSerializer(serializers.ModelSerializer):
                                           **validated_data).exists():
             raise serializers.ValidationError(
                 {'error': 'Вы уже оставили жалобу'})
-        return self.Meta.model.objects.create(user=user, **validated_data)
+        self.Meta.model.objects.create(user=user, **validated_data)
+        return validated_data
 
 
 class PostComplaintSerializer(ComplaintSerializer):
