@@ -58,6 +58,7 @@ const ResetAccountPage = () => {
   const [error, setError] = useState("")
   const history = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
+	const [sendMessage, setSendMessage] = useState(false)
 
   useEffect(() => {
     getUser()
@@ -82,9 +83,9 @@ const ResetAccountPage = () => {
 
     axios.post(`${baseUrl}/auth/password/reset/`, data)
 	    .then(response => {
-		    console.log('---------------')
-		    console.log(response)
-		    console.log(response.data)
+				if (response.status === 200) {
+					setSendMessage(true)
+				}
 	    })
 	    .catch(e => {
 		    const firstError = Object.values(e.response.data)[0][0];
@@ -194,6 +195,17 @@ const ResetAccountPage = () => {
                 {error}
               </Typography>
             }
+
+	          {sendMessage &&
+		          <Typography variant="body2" sx={{
+			          backgroundColor: 'rgba(245,206,53,0.91)',
+			          color: 'white',
+			          mb: 2,
+			          p: 1
+		          }} textAlign="center">
+			          Письмо с инструкциями по восстановлению пароля выслано.
+		          </Typography>
+						}
 
             <form method="post" onSubmit={resetAccountButton}>
 	            <FormControl required>

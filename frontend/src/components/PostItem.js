@@ -13,8 +13,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
 import Card from "@mui/material/Card";
 import * as React from "react";
-import {styled} from "@mui/material/styles";
 import {useState} from "react";
+import {styled} from "@mui/material/styles";
 
 
 const ExpandMore = styled((props) => {
@@ -28,14 +28,14 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-const PostItem = ({post}) => {
+const PostItem = ({post, handleOpen}) => {
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   return (
-    <Card sx={{maxWidth: 500}} style={{marginBottom: 15}}>
+    <Card sx={{mb: 1}}>
       <CardHeader
         avatar={<Avatar aria-label="recipe"/>}
         action={
@@ -52,6 +52,7 @@ const PostItem = ({post}) => {
           height="194"
           image={post.image}
           alt="Картинка"
+          onClick={() => handleOpen(post)}
         />}
 
       <CardContent>
@@ -89,10 +90,10 @@ const PostItem = ({post}) => {
           {post.comments.length <= 0
             ? <Typography paragraph>Комментариев нет!</Typography>
             : post.comments.map(comment =>
-            <div key={comment.id} style={{marginBottom: 20}}>
-              <div>Автор: {comment.author}</div>
-              <div>Комментарий: {comment.text}</div>
-            </div>
+              <div key={comment.id} style={{marginBottom: 20}}>
+                <div>Автор: {comment.author}</div>
+                <div>Комментарий: {comment.text}</div>
+              </div>
             )}
         </CardContent>
       </Collapse>

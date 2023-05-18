@@ -1,14 +1,20 @@
 import PostList from "../components/PostList";
 import {Container} from "@mui/material";
-import {useState} from "react";
+import Header from "../components/Header";
+import AddPost from "../components/AddPost";
 
 const MainPage = () => {
   document.title = "Главная страница"
 
   return (
-    <Container maxWidth="sm">
-      <PostList />
-    </Container>
+    <>
+      <Header />
+      <Container maxWidth="sm">
+      <AddPost />
+        <PostList/>
+      </Container>
+
+    </>
   );
 };
 
